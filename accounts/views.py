@@ -1,5 +1,7 @@
+from django.contrib.auth import login
 from django.contrib.auth.hashers import make_password
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.utils import timezone
 
 from .emails import send_magic_link_email
 from .forms import EmailForm
@@ -9,7 +11,7 @@ from .ratelimit import (
     ip_link_requests_exceeded,
     ip_signup_limit_exceeded,
 )
-from .tokens import create_magic_link
+from .tokens import consume_magic_link, create_magic_link
 from .utils import get_client_ip
 
 
@@ -35,3 +37,19 @@ def _maybe_send_magic_link(email, ip):
         return
     raw_token = create_magic_link(user, requested_ip=ip)
     send_magic_link_email(user.email, raw_token)
+
+
+def verify_magic_link(request, token):
+    user = consume_magic_link(token)
+    if user is None:
+        return redirect("accounts:link_expired")
+    if user.email_verified_at is None:
+        user.email_verified_at = timezone.now()
+        user.save(update_fields=["email_verified_at"])
+    user.backend = "django.contrib.auth.backends.ModelBackend"
+    login(request, user)
+    return redirect("core:home")
+
+
+def link_expired(request):
+    return request_magic_link(request) if request.method == "POST" else render(request, "accounts/link_expired.html")
