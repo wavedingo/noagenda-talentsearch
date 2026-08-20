@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from django.shortcuts import render
 
 from .emails import send_magic_link_email
@@ -25,11 +26,12 @@ def request_magic_link(request):
 def _maybe_send_magic_link(email, ip):
     if email_link_requests_exceeded(email) or ip_link_requests_exceeded(ip):
         return
-    try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
-        if ip_signup_limit_exceeded(ip):
-            return
-        user = User.objects.create_user(email=email, signup_ip=ip)
+    signup_limited = ip_signup_limit_exceeded(ip)
+    user, created = User.objects.get_or_create(
+        email=email, defaults={"signup_ip": ip, "password": make_password(None)}
+    )
+    if created and signup_limited:
+        user.delete()
+        return
     raw_token = create_magic_link(user, requested_ip=ip)
     send_magic_link_email(user.email, raw_token)

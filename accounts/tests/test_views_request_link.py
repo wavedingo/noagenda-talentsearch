@@ -46,3 +46,33 @@ class RequestMagicLinkTests(TestCase):
     def test_email_is_normalized_to_lowercase(self):
         self.client.post(reverse("accounts:request_link"), {"email": "MixedCase@Example.com"})
         self.assertTrue(User.objects.filter(email="mixedcase@example.com").exists())
+
+    def test_get_client_ip_prefers_cf_connecting_ip_over_remote_addr(self):
+        from django.test import RequestFactory
+
+        from accounts.utils import get_client_ip
+
+        factory = RequestFactory()
+        request = factory.post("/login/", HTTP_CF_CONNECTING_IP="9.9.9.9", HTTP_X_FORWARDED_FOR="1.2.3.4")
+        self.assertEqual(get_client_ip(request), "9.9.9.9")
+
+    def test_get_client_ip_ignores_client_supplied_x_forwarded_for(self):
+        from django.test import RequestFactory
+
+        from accounts.utils import get_client_ip
+
+        factory = RequestFactory()
+        request = factory.post("/login/", HTTP_X_FORWARDED_FOR="1.2.3.4", REMOTE_ADDR="5.6.7.8")
+        self.assertEqual(get_client_ip(request), "5.6.7.8")
+
+    def test_rate_limited_new_signup_does_not_leave_orphaned_user(self):
+        from unittest.mock import patch
+
+        with patch("accounts.views.ip_signup_limit_exceeded", return_value=True):
+            self.client.post(reverse("accounts:request_link"), {"email": "blocked-new@example.com"})
+        self.assertFalse(User.objects.filter(email="blocked-new@example.com").exists())
+
+    def test_new_signup_via_view_has_unusable_password(self):
+        self.client.post(reverse("accounts:request_link"), {"email": "pwcheck@example.com"})
+        user = User.objects.get(email="pwcheck@example.com")
+        self.assertFalse(user.has_usable_password())
