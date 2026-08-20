@@ -12,3 +12,7 @@ def healthz(request):
         cursor.execute("SELECT 1")
         cursor.fetchone()
     return JsonResponse({"status": "ok", "database": "ok"})
+
+
+def _test_500(request):
+    raise Exception("intentional test error")
