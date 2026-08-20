@@ -1,11 +1,12 @@
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .emails import send_magic_link_email
-from .forms import EmailForm
+from .forms import AccountForm, EmailForm
 from .models import User
 from .ratelimit import (
     email_link_requests_exceeded,
@@ -58,5 +59,30 @@ def link_expired(request):
 
 @require_POST
 def logout_view(request):
+    logout(request)
+    return redirect("core:home")
+
+
+@login_required
+def account_view(request):
+    if request.method == "POST":
+        form = AccountForm(request.POST)
+        if form.is_valid():
+            request.user.display_name = form.cleaned_data["display_name"]
+            request.user.save(update_fields=["display_name"])
+    else:
+        form = AccountForm(initial={"display_name": request.user.display_name})
+    return render(request, "accounts/account.html", {"form": form})
+
+
+@login_required
+@require_POST
+def delete_account_view(request):
+    user = request.user
+    user.email = f"deleted-{user.id}@deleted.noagendatalentsearch.com"
+    user.display_name = ""
+    user.signup_ip = None
+    user.deleted_at = timezone.now()
+    user.save(update_fields=["email", "display_name", "signup_ip", "deleted_at"])
     logout(request)
     return redirect("core:home")

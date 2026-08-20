@@ -10,4 +10,6 @@ urlpatterns = [
     path("auth/verify/<str:token>/", views.verify_magic_link, name="verify"),
     path("auth/expired/", views.link_expired, name="link_expired"),
     path("logout/", views.logout_view, name="logout"),
+    path("account/", views.account_view, name="account"),
+    path("account/delete/", views.delete_account_view, name="delete_account"),
 ]
