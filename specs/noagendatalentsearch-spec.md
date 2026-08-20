@@ -340,21 +340,21 @@ Ordered setup guide. Steps 1–4 are producer tasks (accounts, DNS, credentials)
 
 ## A.1 Domain & DNS (Cloudflare)
 
-- [ ] Create a Cloudflare account.
-- [ ] Register **noagendatalentsearch.com** via Cloudflare Registrar (at-cost, ~$10–12/yr). DNS is configured automatically.
-- [ ] Enable **Always Use HTTPS** and set SSL/TLS mode to **Full (strict)**.
-- [ ] Under Security → Turnstile, create a widget for the domain. Save the **site key** (public) and **secret key** (private).
-- [ ] Leave DNS records alone for now — the host will supply the target in A.3.
+- [x] Create a Cloudflare account.
+- [x] Register **noagendatalentsearch.com** via Cloudflare Registrar (at-cost, ~$10–12/yr). DNS is configured automatically.
+- [x] Enable **Always Use HTTPS** and set SSL/TLS mode to **Full (strict)**.
+- [x] Under Security → Turnstile, create a widget for the domain. Save the **site key** (public) and **secret key** (private).
+- [x] Leave DNS records alone for now — the host will supply the target in A.3.
 
 ## A.2 Email
 
 **Inbound (hello@noagendatalentsearch.com):**
-- [ ] Cloudflare dashboard → Email → **Email Routing** → enable.
-- [ ] Add a custom address `hello@noagendatalentsearch.com` forwarding to the producer's monitored inbox.
-- [ ] Verify the destination address (Cloudflare sends a confirmation email).
-- [ ] Cloudflare adds the MX and SPF records automatically — accept them.
+- [x] Cloudflare dashboard → Email → **Email Routing** → enable.
+- [x] Add a custom address `hello@noagendatalentsearch.com` forwarding to the producer's monitored inbox.
+- [x] Verify the destination address (Cloudflare sends a confirmation email).
+- [x] Cloudflare adds the MX and SPF records automatically — accept them.
 
-**Outbound (magic links, moderation notices):**
+**Outbound (magic links, moderation notices):** still outstanding as of 2026-08-20. App-side wiring is ready and waiting (`RESEND_API_KEY` set → `config/settings.py` switches from console-log backend to Resend's SMTP relay automatically, no redeploy needed beyond setting the var) — nothing below is done yet.
 - [ ] Create a **Resend** account (free tier covers ~3,000 emails/month; upgrade later as signups grow).
 - [ ] Add and verify the domain in Resend; add the DKIM and SPF records it provides to Cloudflare DNS.
 - [ ] Set the sending identity to `No Agenda Talent Search <hello@noagendatalentsearch.com>`.
@@ -430,13 +430,13 @@ SCORE_WEIGHT_DEMO=0.3
 
 ## A.6 Repository Setup (Claude Code)
 
-- [ ] Initialize repo with `.gitignore` covering `.env`, uploads, and build artifacts.
-- [ ] Commit a `.env.example` listing every variable above with placeholder values.
-- [ ] Dockerfile installs `ffmpeg` (needed for `ffprobe` validation and transcoding).
-- [ ] Add `render.yaml` (Render Blueprint) declaring the web service, Postgres, and both cron jobs so the infrastructure is reproducible.
-- [ ] Add a `/healthz` endpoint returning app + DB status.
-- [ ] Migrations run automatically on deploy.
-- [ ] Add a seed/CLI command to promote a user to admin by email (`manage.py make_admin <email>`) — needed to bootstrap the first admin account.
+- [x] Initialize repo with `.gitignore` covering `.env`, uploads, and build artifacts.
+- [x] Commit a `.env.example` listing every variable above with placeholder values.
+- [x] Dockerfile installs `ffmpeg` (needed for `ffprobe` validation and transcoding).
+- [ ] Add `render.yaml` (Render Blueprint) declaring the web service, Postgres, and both cron jobs so the infrastructure is reproducible. **Partial:** web service + Postgres declared; `rss-sync` cron lands with Phase 2, `recompute-scores` cron with Phase 4.
+- [x] Add a `/healthz` endpoint returning app + DB status.
+- [x] Migrations run automatically on deploy (via `render.yaml`'s `preDeployCommand`).
+- [x] Add a seed/CLI command to promote a user to admin by email (`manage.py make_admin <email>`) — needed to bootstrap the first admin account.
 
 ## A.7 Pre-Launch Smoke Test
 
