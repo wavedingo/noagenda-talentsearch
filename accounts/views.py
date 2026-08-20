@@ -1,7 +1,8 @@
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from .emails import send_magic_link_email
 from .forms import EmailForm
@@ -53,3 +54,9 @@ def verify_magic_link(request, token):
 
 def link_expired(request):
     return request_magic_link(request) if request.method == "POST" else render(request, "accounts/link_expired.html")
+
+
+@require_POST
+def logout_view(request):
+    logout(request)
+    return redirect("core:home")
