@@ -5,6 +5,6 @@
 {% if user.is_authenticated %}
   <p>Signed in as {{ user.email }}.</p>
 {% else %}
-  <p>Log in or sign up to participate.</p>
+  <p><a href="{% url 'accounts:request_link' %}">Log in or sign up</a></p>
 {% endif %}
 {% endblock %}
