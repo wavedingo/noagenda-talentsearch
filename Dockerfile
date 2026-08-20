@@ -14,4 +14,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Exists so WhiteNoise doesn't warn about a missing STATIC_ROOT in dev/test,
+# where collectstatic is never run (only production's preDeployCommand runs it).
+RUN mkdir -p staticfiles
+
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]
