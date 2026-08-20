@@ -14,7 +14,9 @@ def require_env(name):
 
 
 APP_ENV = os.environ.get("APP_ENV", "development")
-DEBUG = APP_ENV != "production"
+if APP_ENV not in {"development", "production"}:
+    raise RuntimeError(f"Invalid APP_ENV={APP_ENV!r}; must be 'development' or 'production'")
+DEBUG = APP_ENV == "development"
 
 SECRET_KEY = require_env("SECRET_KEY")
 

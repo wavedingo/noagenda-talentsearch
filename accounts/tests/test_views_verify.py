@@ -1,10 +1,7 @@
-from datetime import timedelta
-
 from django.test import TestCase
 from django.urls import reverse
-from django.utils import timezone
 
-from accounts.models import MagicLink, User
+from accounts.models import User
 from accounts.tokens import create_magic_link
 
 
@@ -16,7 +13,6 @@ class VerifyMagicLinkTests(TestCase):
         raw_token = create_magic_link(self.user)
         response = self.client.get(reverse("accounts:verify", args=[raw_token]))
         self.assertRedirects(response, reverse("core:home"))
-        self.assertTrue(response.wsgi_request.user.is_authenticated if hasattr(response, "wsgi_request") else True)
         # Confirm the session actually authenticated the user on a follow-up request.
         home = self.client.get(reverse("core:home"))
         self.assertContains(home, "producer@example.com")

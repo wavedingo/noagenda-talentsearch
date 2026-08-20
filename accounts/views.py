@@ -1,6 +1,7 @@
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
+from django.db import transaction
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -31,12 +32,18 @@ def _maybe_send_magic_link(email, ip):
     if email_link_requests_exceeded(email) or ip_link_requests_exceeded(ip):
         return
     signup_limited = ip_signup_limit_exceeded(ip)
-    user, created = User.objects.get_or_create(
-        email=email, defaults={"signup_ip": ip, "password": make_password(None)}
-    )
-    if created and signup_limited:
-        user.delete()
-        return
+    # get_or_create (not UserManager.create_user()) so existing- and new-email
+    # requests share one DB call, narrowing the timing side-channel between the
+    # two cases. password=make_password(None) manually replicates
+    # set_unusable_password() for that reason -- don't "simplify" this back to
+    # create_user(), it reintroduces the timing asymmetry.
+    with transaction.atomic():
+        user, created = User.objects.get_or_create(
+            email=email, defaults={"signup_ip": ip, "password": make_password(None)}
+        )
+        if created and signup_limited:
+            user.delete()
+            return
     raw_token = create_magic_link(user, requested_ip=ip)
     send_magic_link_email(user.email, raw_token)
 

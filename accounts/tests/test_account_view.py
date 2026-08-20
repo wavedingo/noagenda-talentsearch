@@ -42,3 +42,5 @@ class AccountViewTests(TestCase):
         # but the resulting session belongs to a deactivated account.
         self.user.refresh_from_db()
         self.assertFalse(self.user.is_active)
+        account_response = self.client.get(reverse("accounts:account"))
+        self.assertEqual(account_response.status_code, 302)

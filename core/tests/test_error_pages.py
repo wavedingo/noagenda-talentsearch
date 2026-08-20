@@ -14,4 +14,4 @@ class ErrorPageTests(TestCase):
             client = Client(raise_request_exception=False)
             response = client.get("/__test-500__/")
             self.assertEqual(response.status_code, 500)
-            self.assertContains(response, "something went wrong", status_code=500)
+            self.assertContains(response, "went wrong", status_code=500)

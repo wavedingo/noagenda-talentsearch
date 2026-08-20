@@ -3,7 +3,7 @@
 <h1>No Agenda Talent Search</h1>
 <p>The community-driven audition for the show's next co-host.</p>
 {% if user.is_authenticated %}
-  <p>Signed in as {{ user.email }}.</p>
+  <p>Signed in as {{ user.email }}. <a href="{% url 'accounts:account' %}">Your account</a></p>
   <form method="post" action="{% url 'accounts:logout' %}">
     {% csrf_token %}
     <button type="submit">Log out</button>

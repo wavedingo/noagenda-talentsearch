@@ -31,14 +31,10 @@ def create_magic_link(user, requested_ip=None):
 
 def consume_magic_link(raw_token):
     token_hash = hash_token(raw_token)
-    try:
-        link = MagicLink.objects.get(token_hash=token_hash)
-    except MagicLink.DoesNotExist:
+    now = timezone.now()
+    updated = MagicLink.objects.filter(
+        token_hash=token_hash, used_at__isnull=True, expires_at__gte=now
+    ).update(used_at=now)
+    if not updated:
         return None
-    if link.used_at is not None:
-        return None
-    if link.expires_at < timezone.now():
-        return None
-    link.used_at = timezone.now()
-    link.save(update_fields=["used_at"])
-    return link.user
+    return MagicLink.objects.get(token_hash=token_hash).user

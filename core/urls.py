@@ -1,5 +1,4 @@
-import os
-
+from django.conf import settings
 from django.urls import path
 
 from . import views
@@ -11,5 +10,5 @@ urlpatterns = [
     path("healthz", views.healthz, name="healthz"),
 ]
 
-if os.environ.get("APP_ENV") != "production":
+if settings.APP_ENV != "production":
     urlpatterns += [path("__test-500__/", views._test_500, name="test_500")]

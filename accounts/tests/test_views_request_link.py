@@ -2,7 +2,7 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
-from accounts.models import MagicLink, User
+from accounts.models import User
 
 
 class RequestMagicLinkTests(TestCase):
@@ -35,7 +35,7 @@ class RequestMagicLinkTests(TestCase):
         )
 
     def test_email_over_rate_limit_sends_no_further_mail(self):
-        user = User.objects.create_user(email="throttled@example.com")
+        User.objects.create_user(email="throttled@example.com")
         for _ in range(3):
             self.client.post(reverse("accounts:request_link"), {"email": "throttled@example.com"})
         mail.outbox.clear()
