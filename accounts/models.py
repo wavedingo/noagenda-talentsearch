@@ -65,3 +65,12 @@ class User(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return self.is_staff
+
+
+class MagicLink(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="magic_links")
+    token_hash = models.CharField(max_length=64, unique=True)
+    requested_ip = models.GenericIPAddressField(null=True, blank=True)
+    expires_at = models.DateTimeField()
+    used_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
