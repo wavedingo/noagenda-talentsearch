@@ -107,10 +107,11 @@ A **cron job (every 30 minutes)** fetches `https://feeds.noagendaassets.com/noag
 - **Episode floor: ingest only episodes numbered ≥ 1890.** This site covers the show's new era, and 1890 is the first regular episode of it — 1889 was the producer tribute to John and sits outside the guest-host format this site exists to support. Items below the floor are skipped silently during sync — not stored, not displayed. Implement as the runtime setting `min_episode_number` (§4.1) rather than a hardcoded constant, so the boundary can be moved without a redeploy or a migration.
   - The floor is applied **after** the number is parsed. An item whose number can't be parsed is skipped as a parse failure (logged), not treated as below the floor.
   - Because of the floor, `/episodes` is **not** a full archive and shouldn't look like a broken one. Label the page accordingly (e.g. "Episodes since the show's return") and don't paginate into emptiness below the floor.
-  - If the floor is ever lowered, the next sync backfills the newly-eligible episodes automatically, provided the feed still carries them. Verify the feed's actual depth before relying on that.
+  - If the floor is ever lowered, the next sync backfills the newly-eligible episodes automatically, provided the feed still carries them — which, per the depth note below, means back to roughly episode 1667.
 - **Don't import `<description>`.** It's a large HTML blob of executive-producer credits, knighting announcements, and donor names — hundreds of lines per episode, occasionally with malformed markup. It has no use on this site and rendering it would be both ugly and a privacy own-goal. Skip the field entirely.
 - **Publish days aren't reliable.** The show is nominally Thursday/Sunday, but the feed shows episodes landing on a Friday (1888) and a Monday (1889). Never infer anything from day-of-week.
-- **Verify the feed's depth before promising a full archive.** Confirm whether the feed carries the entire back catalogue or a rolling window. If it's a window, the site will only ever know about recent episodes — fine for this purpose (appearances are all forward-looking), but the `/episodes` page should say so rather than appear to be a broken archive.
+- **Feed depth — ANSWERED (2026-08-20):** the feed is a **rolling window of 230 items** (episodes 1667–1896 at time of checking), not the full back catalogue. The site will only ever know about recent episodes — fine here, since appearances are all forward-looking — and `/episodes` says so rather than appearing to be a broken archive. Two consequences the sync respects: an episode dropping out of the window is never treated as a deletion, and lowering `min_episode_number` only backfills as deep as the window still reaches.
+- **The feed declares guest hosts, and its `host` role is stale — verified 2026-08-20.** Items carry `<podcast:person>` elements. `role="guest host"` is hand-curated and reliable (Rob Dew on 1896 was the only one at time of checking). `role="host"` is a boilerplate template value: John C Dvorak is listed on 229 of 230 items, including 1889 — the producer tribute to him — and every episode published since. **Ingest and display `role="guest host"` only; never render anything from `role="host"`.**
 - The site does **not** host or rehost episode audio.
 - Episodes display newest-first with artwork, cleaned title, episode number, and date.
 
@@ -433,7 +434,7 @@ SCORE_WEIGHT_DEMO=0.3
 - [x] Initialize repo with `.gitignore` covering `.env`, uploads, and build artifacts.
 - [x] Commit a `.env.example` listing every variable above with placeholder values.
 - [x] Dockerfile installs `ffmpeg` (needed for `ffprobe` validation and transcoding).
-- [ ] Add `render.yaml` (Render Blueprint) declaring the web service, Postgres, and both cron jobs so the infrastructure is reproducible. **Partial:** web service + Postgres declared; `rss-sync` cron lands with Phase 2, `recompute-scores` cron with Phase 4.
+- [ ] Add `render.yaml` (Render Blueprint) declaring the web service, Postgres, and both cron jobs so the infrastructure is reproducible. **Partial:** web service + Postgres + the `rss-sync` cron (every 30 min) are declared; `recompute-scores` cron lands with Phase 4.
 - [x] Add a `/healthz` endpoint returning app + DB status.
 - [x] Migrations run automatically on deploy (via `render.yaml`'s `preDeployCommand`).
 - [x] Add a seed/CLI command to promote a user to admin by email (`manage.py make_admin <email>`) — needed to bootstrap the first admin account.
