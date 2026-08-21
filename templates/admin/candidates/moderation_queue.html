@@ -1,0 +1,114 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<style>
+  .mq-section { margin: 0 0 2.5rem; }
+  .mq-item { border: 1px solid var(--hairline-color, #ddd); border-radius: 6px; padding: 1rem; margin-bottom: 1rem; }
+  .mq-head { font-weight: 600; margin: 0 0 .35rem; }
+  .mq-meta { color: var(--body-quiet-color, #666); font-size: .85rem; margin: 0 0 .5rem; }
+  .mq-bio { white-space: pre-wrap; margin: .5rem 0; max-width: 44rem; }
+  .mq-diff { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); }
+  .mq-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: .75rem; }
+  .mq-empty { color: var(--body-quiet-color, #666); font-style: italic; }
+  .mq-error { white-space: pre-wrap; font-family: monospace; font-size: .8rem; }
+</style>
+
+{# admin/base_site.html already renders `title` as the heading. #}
+<p>Nothing here is public. Approving is what publishes it.</p>
+
+{% comment %}
+  One form per item rather than one per section: a moderator working through a
+  queue is making individual judgements, and a bulk checkbox invites approving
+  something nobody actually listened to.
+{% endcomment %}
+
+<div class="mq-section">
+  <h2>New candidates ({{ pending_candidates|length }})</h2>
+  {% for candidate in pending_candidates %}
+    <div class="mq-item">
+      <p class="mq-head">{{ candidate.stage_name }}</p>
+      <p class="mq-meta">{{ candidate.user.email }} · submitted {{ candidate.created_at|date:"j M Y, H:i" }} · /candidates/{{ candidate.slug }}/</p>
+      {% if candidate.photo_url %}<img src="{{ candidate.photo_url }}" alt="" width="120" height="120" style="border-radius:6px;object-fit:cover">{% endif %}
+      <p class="mq-bio">{{ candidate.bio|default:"(no bio)" }}</p>
+      {% include "admin/candidates/_decision_form.html" with target="candidate" target_id=candidate.pk reasons=rejection_reasons %}
+    </div>
+  {% empty %}
+    <p class="mq-empty">Nothing waiting.</p>
+  {% endfor %}
+</div>
+
+<div class="mq-section">
+  <h2>Profile edits ({{ pending_edits|length }})</h2>
+  {% for candidate in pending_edits %}
+    <div class="mq-item">
+      <p class="mq-head">{{ candidate.stage_name }}</p>
+      <p class="mq-meta">{{ candidate.user.email }} · edited {{ candidate.pending_submitted_at|date:"j M Y, H:i" }} · currently live</p>
+      <div class="mq-diff">
+        <div>
+          <p class="mq-meta"><strong>Live now</strong></p>
+          <p class="mq-head">{{ candidate.stage_name }}</p>
+          <p class="mq-bio">{{ candidate.bio|default:"(no bio)" }}</p>
+          {% if candidate.photo_url %}<img src="{{ candidate.photo_url }}" alt="" width="100" height="100" style="border-radius:6px;object-fit:cover">{% endif %}
+        </div>
+        <div>
+          <p class="mq-meta"><strong>Proposed</strong></p>
+          <p class="mq-head">{{ candidate.pending_stage_name|default:candidate.stage_name }}</p>
+          <p class="mq-bio">{{ candidate.pending_bio|default:"(no bio)" }}</p>
+          {% if candidate.pending_photo_path %}<img src="{{ candidate.pending_photo_url }}" alt="" width="100" height="100" style="border-radius:6px;object-fit:cover">{% endif %}
+        </div>
+      </div>
+      <p class="mq-meta">Rejecting discards the draft; their live profile stays exactly as it is.</p>
+      {% include "admin/candidates/_decision_form.html" with target="profile_edit" target_id=candidate.pk reasons=rejection_reasons %}
+    </div>
+  {% empty %}
+    <p class="mq-empty">Nothing waiting.</p>
+  {% endfor %}
+</div>
+
+<div class="mq-section">
+  <h2>Demos ({{ pending_demos|length }})</h2>
+  {% for demo in pending_demos %}
+    <div class="mq-item">
+      <p class="mq-head">{{ demo.candidate.stage_name }}</p>
+      <p class="mq-meta">
+        {{ demo.candidate.user.email }} · uploaded {{ demo.created_at|date:"j M Y, H:i" }}
+        {% if demo.duration_display %} · {{ demo.duration_display }}{% endif %}
+        · candidate is {{ demo.candidate.get_status_display|lower }}
+      </p>
+      <audio controls preload="none" src="{{ demo.stream_url }}" style="max-width:100%"></audio>
+      {% include "admin/candidates/_decision_form.html" with target="demo" target_id=demo.pk reasons=rejection_reasons %}
+    </div>
+  {% empty %}
+    <p class="mq-empty">Nothing waiting.</p>
+  {% endfor %}
+</div>
+
+<div class="mq-section">
+  <h2>Still processing ({{ stuck_demos|length }})</h2>
+  {% for demo in stuck_demos %}
+    <div class="mq-item">
+      <p class="mq-head">{{ demo.candidate.stage_name }}</p>
+      <p class="mq-meta">{{ demo.get_processing_state_display }} since {{ demo.created_at|date:"j M Y, H:i" }}</p>
+    </div>
+  {% empty %}
+    <p class="mq-empty">Queue is clear.</p>
+  {% endfor %}
+  <form method="post" action="{% url 'admin:candidates_process_demos' %}">
+    {% csrf_token %}
+    <button type="submit" class="button">Process queued demos now</button>
+  </form>
+</div>
+
+<div class="mq-section">
+  <h2>Failed to process ({{ failed_demos|length }})</h2>
+  {% for demo in failed_demos %}
+    <div class="mq-item">
+      <p class="mq-head">{{ demo.candidate.stage_name }}</p>
+      <p class="mq-meta">uploaded {{ demo.created_at|date:"j M Y, H:i" }}</p>
+      <p class="mq-error">{{ demo.processing_error }}</p>
+    </div>
+  {% empty %}
+    <p class="mq-empty">Nothing failed.</p>
+  {% endfor %}
+</div>
+{% endblock %}

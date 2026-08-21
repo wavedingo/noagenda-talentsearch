@@ -1,0 +1,18 @@
+{% comment %}
+  Approve and reject share one form so a moderator can't reject without the
+  reason select in front of them. The reason starts blank on purpose: the server
+  refuses a rejection with no reason, because the reason is what the candidate
+  actually receives.
+{% endcomment %}
+<form method="post" action="{% url 'admin:candidates_moderation_decide' %}" class="mq-actions">
+  {% csrf_token %}
+  <input type="hidden" name="target" value="{{ target }}">
+  <input type="hidden" name="target_id" value="{{ target_id }}">
+  <button type="submit" name="action" value="approve" class="button default">Approve</button>
+  <select name="reason" aria-label="Rejection reason">
+    <option value="">Reason for rejecting…</option>
+    {% for value, label in reasons %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+  </select>
+  <input type="text" name="note" maxlength="1000" placeholder="Optional note to the candidate" size="34">
+  <button type="submit" name="action" value="reject" class="button">Reject</button>
+</form>
