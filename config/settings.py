@@ -82,6 +82,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 STORAGES = {
     "default": {
@@ -117,6 +118,8 @@ if RESEND_API_KEY:
     EMAIL_USE_TLS = True
 else:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+RSS_FEED_URL = os.environ.get("RSS_FEED_URL", "https://feeds.noagendaassets.com/noagenda.xml")
 
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 90  # 90 days, sliding
 SESSION_SAVE_EVERY_REQUEST = True
