@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 
 import dj_database_url
@@ -84,10 +85,49 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+# Cloudflare R2 (spec A.4). Like RESEND_API_KEY in Phase 1, this switches on the
+# presence of credentials: with them the site stores uploads in R2 and serves
+# them from the public media domain; without them it falls back to local disk so
+# development works before the bucket exists. Nothing outside this block knows
+# which is in play -- every upload path goes through `default_storage`.
+R2_ACCOUNT_ID = os.environ.get("R2_ACCOUNT_ID", "")
+R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID", "")
+R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY", "")
+R2_BUCKET = os.environ.get("R2_BUCKET", "")
+R2_PUBLIC_BASE_URL = os.environ.get("R2_PUBLIC_BASE_URL", "")
+
+USE_R2 = all([R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, R2_PUBLIC_BASE_URL])
+
+if USE_R2:
+    DEFAULT_FILE_STORAGE_CONFIG = {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "bucket_name": R2_BUCKET,
+            "access_key": R2_ACCESS_KEY_ID,
+            "secret_key": R2_SECRET_ACCESS_KEY,
+            "endpoint_url": f"https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com",
+            "region_name": "auto",
+            # Reads go to the public custom domain, never to the S3 endpoint.
+            "custom_domain": R2_PUBLIC_BASE_URL.split("//")[-1].rstrip("/"),
+            # R2's public domain is unauthenticated, so signed query strings
+            # would only produce URLs that expire for no benefit.
+            "querystring_auth": False,
+            # R2 has no ACL concept; sending one is an error, not a no-op.
+            "default_acl": None,
+            "file_overwrite": False,
+            "signature_version": "s3v4",
+            # Cloudflare documents the path-style endpoint form.
+            "addressing_style": "path",
+        },
+    }
+else:
+    DEFAULT_FILE_STORAGE_CONFIG = {"BACKEND": "django.core.files.storage.FileSystemStorage"}
+
 STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
+    "default": DEFAULT_FILE_STORAGE_CONFIG,
     "staticfiles": {
         "BACKEND": (
             "django.contrib.staticfiles.storage.StaticFilesStorage"
@@ -96,6 +136,15 @@ STORAGES = {
         ),
     },
 }
+
+FFMPEG_BIN = os.environ.get("FFMPEG_BIN", "ffmpeg")
+FFPROBE_BIN = os.environ.get("FFPROBE_BIN", "ffprobe")
+
+# Uploads are validated in-request (fast -- ffprobe only reads headers) but
+# transcoded in a background thread, which would otherwise race a test's own
+# transaction rollback. `manage.py process_demos` is the backstop either way.
+DEMO_PROCESS_IN_BACKGROUND = "test" not in sys.argv
+DEMO_STALE_PROCESSING_MINUTES = 20
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
