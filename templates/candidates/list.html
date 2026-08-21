@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Candidates — No Agenda Talent Search{% endblock %}
+{% block content %}
+<h1>Candidates</h1>
+<p class="page-intro">
+  Producers who have put themselves forward, and whose profiles have been reviewed.
+  {% if auditions_open %}<a href="{% url 'candidates:audition' %}">Audition yourself →</a>{% endif %}
+</p>
+
+{% if page_obj.object_list %}
+  <p class="note sort-bar">
+    Sort:
+    {% if sort == "newest" %}<strong>newest</strong>{% else %}<a href="?sort=newest">newest</a>{% endif %}
+    ·
+    {% if sort == "name" %}<strong>name</strong>{% else %}<a href="?sort=name">name</a>{% endif %}
+  </p>
+
+  <ul class="candidate-grid">
+    {% for candidate in page_obj %}
+      <li class="candidate-card">
+        {% if candidate.photo_url %}
+          <img class="candidate-photo" src="{{ candidate.photo_url }}" alt="" loading="lazy" width="72" height="72">
+        {% else %}
+          <span class="candidate-photo" aria-hidden="true"></span>
+        {% endif %}
+        <div class="candidate-body">
+          <p class="candidate-name">
+            <a href="{% url 'candidates:detail' candidate.slug %}">{{ candidate.stage_name }}</a>
+          </p>
+          {% if candidate.is_featured %}<span class="badge">Featured</span>{% endif %}
+          {% if candidate.bio %}<p class="note candidate-snippet">{{ candidate.bio|truncatewords:22 }}</p>{% endif %}
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+
+  {% if page_obj.has_other_pages %}
+    <nav class="pagination">
+      {% if page_obj.has_previous %}
+        <a href="?sort={{ sort }}&amp;page={{ page_obj.previous_page_number }}">← Previous</a>
+      {% else %}<span></span>{% endif %}
+      <span class="note">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?sort={{ sort }}&amp;page={{ page_obj.next_page_number }}">Next →</a>
+      {% else %}<span></span>{% endif %}
+    </nav>
+  {% endif %}
+{% else %}
+  <p class="empty-state">
+    No candidates yet.
+    {% if auditions_open %}
+      Auditions are open — <a href="{% url 'candidates:audition' %}">you could be the first</a>.
+    {% endif %}
+  </p>
+{% endif %}
+{% endblock %}

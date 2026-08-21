@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ candidate.stage_name }} — No Agenda Talent Search{% endblock %}
+{% block content %}
+<p class="note"><a href="{% url 'candidates:list' %}">← All candidates</a></p>
+
+{% if not candidate.is_public %}
+  <p class="note preview-banner">
+    Not public: this profile is <strong>{{ candidate.get_status_display|lower }}</strong>.
+    You can see it because it's yours or you moderate the site.
+  </p>
+{% endif %}
+
+<div class="candidate-detail-head">
+  {% if candidate.photo_url %}
+    <img class="candidate-detail-photo" src="{{ candidate.photo_url }}"
+         alt="Photo of {{ candidate.stage_name }}" width="160" height="160">
+  {% endif %}
+  <div>
+    <h1>{{ candidate.stage_name }}</h1>
+    {% if candidate.is_featured %}<span class="badge">Featured</span>{% endif %}
+  </div>
+</div>
+
+{% if candidate.bio %}
+  <h2>About</h2>
+  <p class="candidate-bio">{{ candidate.bio|linebreaksbr }}</p>
+{% endif %}
+
+<h2>Demo tape</h2>
+{% if demo %}
+  {% comment %}
+    preload="none" is deliberate: this page will be linked from the show, and
+    preloading would pull a few megabytes per visitor off R2 before anyone
+    presses play. The src is always the transcoded stream copy -- the original
+    upload still carries its ID3 tags and is never served (spec 3.2).
+  {% endcomment %}
+  <audio controls preload="none" src="{{ demo.stream_url }}"></audio>
+  {% if demo.duration_display %}<p class="note">{{ demo.duration_display }} long.</p>{% endif %}
+{% else %}
+  <p class="empty-state">No demo published yet.</p>
+{% endif %}
+
+<h2>On the show</h2>
+<p class="empty-state">
+  Guest-host appearances and their ratings appear here once appearance tagging is live.
+</p>
+{% endblock %}

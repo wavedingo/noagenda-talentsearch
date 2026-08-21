@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Audition — No Agenda Talent Search{% endblock %}
+{% block content %}
+<h1>Audition</h1>
+
+{% if candidate %}
+  {# --- Where the submission stands ------------------------------------- #}
+  {% if candidate.status == "live" %}
+    <p class="status-line status-live">
+      Your profile is live at
+      <a href="{% url 'candidates:detail' candidate.slug %}">/candidates/{{ candidate.slug }}/</a>.
+    </p>
+    {% if candidate.has_pending_edit %}
+      <p class="note">
+        Your recent edits are waiting on a moderator. Until they're approved, the public
+        page still shows your previously approved profile — it hasn't gone anywhere.
+      </p>
+    {% endif %}
+  {% elif candidate.status == "pending" %}
+    <p class="status-line status-pending">
+      Your profile is with a moderator. Nothing is public until it's approved.
+    </p>
+  {% elif candidate.status == "rejected" %}
+    <p class="status-line status-rejected">We couldn't publish your profile as it stands.</p>
+    <p class="note">{{ candidate.rejection_message|linebreaksbr }}</p>
+    <p class="note">Edit below and save to send it back for review.</p>
+  {% elif candidate.status == "withdrawn" %}
+    <p class="status-line status-pending">
+      Your profile is withdrawn and isn't public.
+    </p>
+    <form method="post" action="{% url 'candidates:reopen' %}">
+      {% csrf_token %}
+      <button type="submit">Put my profile back in the queue</button>
+    </form>
+  {% elif candidate.status == "banned" %}
+    <p class="status-line status-rejected">
+      This profile has been removed. Email hello@noagendatalentsearch.com if you think
+      that's a mistake.
+    </p>
+  {% endif %}
+{% elif not auditions_open %}
+  <p class="empty-state">
+    Auditions are closed at the moment. Keep an eye on the show — they'll reopen.
+  </p>
+{% else %}
+  <p class="page-intro">
+    Tell us who you are and send a demo tape. A moderator reviews everything before it
+    goes public — nothing appears on the site until then.
+  </p>
+{% endif %}
+
+{% if candidate or auditions_open %}
+  {% if candidate.status != "banned" %}
+    <h2>Your profile</h2>
+    <form method="post" enctype="multipart/form-data" class="stacked-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Save profile</button>
+    </form>
+
+    <h2>Your demo</h2>
+    {% if demo %}
+      {% if demo.processing_state == "queued" or demo.processing_state == "processing" %}
+        <p class="status-line status-pending">
+          We're preparing your demo for playback. Reload in a minute.
+        </p>
+      {% elif demo.processing_state == "failed" %}
+        <p class="status-line status-rejected">
+          We couldn't process that file. Please try exporting it again as a standard MP3.
+        </p>
+      {% elif demo.status == "live" %}
+        <p class="status-line status-live">Your demo is live and producers can hear it.</p>
+        <audio controls preload="none" src="{{ demo.stream_url }}"></audio>
+      {% elif demo.status == "rejected" %}
+        <p class="status-line status-rejected">We can't publish this demo.</p>
+        <p class="note">{{ demo.rejection_message|linebreaksbr }}</p>
+        <audio controls preload="none" src="{{ demo.stream_url }}"></audio>
+      {% else %}
+        <p class="status-line status-pending">
+          Your demo is ready and waiting on a moderator to listen.
+        </p>
+        <audio controls preload="none" src="{{ demo.stream_url }}"></audio>
+      {% endif %}
+      {% if demo.duration_display %}<p class="note">{{ demo.duration_display }} long.</p>{% endif %}
+    {% else %}
+      <p class="note">No demo yet.</p>
+    {% endif %}
+
+    <form method="post" action="{% url 'candidates:upload_demo' %}" enctype="multipart/form-data" class="stacked-form">
+      {% csrf_token %}
+      {{ demo_form.as_p }}
+      <p class="note">
+        MP3 only, up to {{ max_file_mb }} MB and {{ max_duration_min }} minutes.
+        Uploading a new demo replaces the old one and starts its ratings fresh.
+      </p>
+      <button type="submit">Upload demo</button>
+    </form>
+
+    {% if candidate and candidate.status != "withdrawn" %}
+      <h2>Withdraw</h2>
+      <p class="note">
+        Takes your profile off the site. You can put it back later; it'll go through
+        review again.
+      </p>
+      <form method="post" action="{% url 'candidates:withdraw' %}">
+        {% csrf_token %}
+        <button type="submit" class="button-quiet">Withdraw my audition</button>
+      </form>
+    {% endif %}
+  {% endif %}
+{% endif %}
+{% endblock %}
