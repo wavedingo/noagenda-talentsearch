@@ -62,6 +62,14 @@ A producer clicks "Audition" and creates a candidate profile:
 - One active candidate profile per account.
 - Candidate statuses: `pending`, `live`, `rejected`, `withdrawn`, `banned`, and admin-set flags: `guest_host` (has appeared on the show), `featured`.
 
+**Implementation notes (settled 2026-08-20, Phase 3):**
+
+- **A live candidate's edits do not un-publish their profile.** Pre-moderation is enforced by splitting the columns, not by flipping the status: `stage_name`/`bio`/`photo_path` hold the *approved* copy and are the only fields a public template reads, while a live candidate's edits land in `pending_*` columns until a moderator promotes them. Sending a live candidate back to `pending` for a typo fix would remove their page from the site for hours and would hand any candidate a way to pull their own profile down mid-rating. Candidates who aren't live yet have no approved copy to protect, so their edits go straight to the main fields and reset the status to `pending`.
+- **The slug is assigned once, at creation, and never re-derived from the stage name.** `/candidates/:slug` is a link people paste into chats and show notes; deriving it from an editable field means a rename silently breaks every existing one. Only a moderator can change it afterwards.
+- **The stored original is never served.** Only the transcoded stream copy is stripped of metadata (`-map_metadata -1`), so the original still carries whatever ID3 tags — often a real name — the uploader's machine wrote. Originals live under a `private/` key prefix and appear in no template. See the Cloudflare rule in A.4.
+- **`guest_host` is derived, not stored.** §5's data model has no column for it and Phase 4's `Appearance` rows answer the same question exactly; a hand-set boolean alongside them would eventually disagree. `featured` *is* stored, because nothing derives it.
+- **Uploads are capped at 5 per account per day.** Rate limits are otherwise a Phase 5 item (§8), but this is the first authenticated endpoint that accepts 50 MB and starts an ffmpeg process, so the cap ships with it.
+
 ### 3.3 Demo Ratings
 
 - Registered, vote-eligible producers rate each demo **1–5 stars**.
@@ -367,9 +375,10 @@ Ordered setup guide. Steps 1–4 are producer tasks (accounts, DNS, credentials)
 - [ ] Create a Render account, connect it to GitHub.
 - [ ] Create a **Web Service** from the repo (Claude Code will provide a Dockerfile — use Docker runtime so `ffmpeg` is available).
 - [ ] Create a **Render Postgres** instance (starter tier is plenty). Copy the internal connection string.
-- [ ] Create two **Cron Jobs**:
+- [ ] Create three **Cron Jobs** (all declared in `render.yaml`, so a Blueprint deploy creates them):
   - `rss-sync` — every 30 min (`*/30 * * * *`)
-  - `recompute-scores` — hourly (`0 * * * *`)
+  - `process-demos` — every 15 min (`*/15 * * * *`); the transcode backstop, not the normal path — uploads transcode immediately in a background thread, and this only picks up what a deploy or crash abandoned
+  - `recompute-scores` — hourly (`0 * * * *`) — lands with Phase 4
 - [ ] Add the custom domain `noagendatalentsearch.com` in Render; it will supply a CNAME/A target to add in Cloudflare DNS.
 - [ ] In Cloudflare, add that record with proxy **enabled** (orange cloud).
 - [ ] Enable **auto-deploy on push to `main`**.
@@ -381,6 +390,8 @@ Ordered setup guide. Steps 1–4 are producer tasks (accounts, DNS, credentials)
 - [ ] Connect a public custom domain for reads: `media.noagendatalentsearch.com`.
 - [ ] Set a bucket CORS policy allowing GET from the site origin.
 - [ ] Confirm uploads go *only* through the app (signed server-side); the public domain is read-only.
+- [ ] **Block `/private/*` on `media.noagendatalentsearch.com`** with a Cloudflare rule. The app writes original uploads under a `private/` key prefix and never links to them, but an R2 custom domain serves the whole bucket — and unlike the streaming copy, the original still carries the uploader's ID3 tags. The keys are UUIDs so nothing is enumerable, but this is the belt to that braces.
+- [ ] Set the five `R2_*` variables on **both** the web service and the `process-demos` cron. The app falls back to local disk if any one of them is missing, which on Render means uploads disappear at the next deploy — set them before auditions open, not after.
 
 ## A.5 Environment Variables
 
@@ -434,7 +445,7 @@ SCORE_WEIGHT_DEMO=0.3
 - [x] Initialize repo with `.gitignore` covering `.env`, uploads, and build artifacts.
 - [x] Commit a `.env.example` listing every variable above with placeholder values.
 - [x] Dockerfile installs `ffmpeg` (needed for `ffprobe` validation and transcoding).
-- [ ] Add `render.yaml` (Render Blueprint) declaring the web service, Postgres, and both cron jobs so the infrastructure is reproducible. **Partial:** web service + Postgres + the `rss-sync` cron (every 30 min) are declared; `recompute-scores` cron lands with Phase 4.
+- [ ] Add `render.yaml` (Render Blueprint) declaring the web service, Postgres, and both cron jobs so the infrastructure is reproducible. **Partial:** web service + Postgres + the `rss-sync` (every 30 min) and `process-demos` (every 15 min) crons are declared; `recompute-scores` cron lands with Phase 4.
 - [x] Add a `/healthz` endpoint returning app + DB status.
 - [x] Migrations run automatically on deploy (via `render.yaml`'s `preDeployCommand`).
 - [x] Add a seed/CLI command to promote a user to admin by email (`manage.py make_admin <email>`) — needed to bootstrap the first admin account.
