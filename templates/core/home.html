@@ -3,6 +3,16 @@
 <h1>No Agenda Talent Search</h1>
 <p class="page-intro">The community-driven audition for the show's next co-host.</p>
 
+{% if auditions_open %}
+  <p class="cta">
+    <a href="{% url 'candidates:audition' %}">Audition for the show →</a>
+  </p>
+  <p class="note">
+    Send a demo tape, the audience listens, the show decides. Everything is reviewed
+    before it goes public.
+  </p>
+{% endif %}
+
 {% if user.is_authenticated %}
   <div class="note">
     Signed in as {{ user.email }}.
@@ -13,6 +23,27 @@
   </div>
 {% else %}
   <p><a href="{% url 'accounts:request_link' %}">Log in or sign up</a></p>
+{% endif %}
+
+{% if latest_candidates %}
+  <h2>Recently approved candidates</h2>
+  <ul class="candidate-grid">
+    {% for candidate in latest_candidates %}
+      <li class="candidate-card">
+        {% if candidate.photo_url %}
+          <img class="candidate-photo" src="{{ candidate.photo_url }}" alt="" loading="lazy" width="72" height="72">
+        {% else %}
+          <span class="candidate-photo" aria-hidden="true"></span>
+        {% endif %}
+        <div class="candidate-body">
+          <p class="candidate-name">
+            <a href="{% url 'candidates:detail' candidate.slug %}">{{ candidate.stage_name }}</a>
+          </p>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+  <p><a href="{% url 'candidates:list' %}">All candidates →</a></p>
 {% endif %}
 
 {% if latest_episodes %}

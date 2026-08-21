@@ -9,6 +9,8 @@
   --ink-soft: #5f5c57;
   --line: #e2ded7;
   --accent: #9a3412;
+  --ok: #2f6f4f;
+  --bad: #a13333;
   --radius: 10px;
 }
 
@@ -20,6 +22,8 @@
     --ink-soft: #a9a49b;
     --line: #33312c;
     --accent: #f4a261;
+    --ok: #7bbf95;
+    --bad: #e78585;
   }
 }
 
@@ -167,4 +171,165 @@ h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
   justify-content: space-between;
   margin-top: 2rem;
   font-size: 0.95rem;
+}
+
+/* Messages */
+
+.messages {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.message {
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 0.95rem;
+}
+
+.message-success { border-color: var(--ok); color: var(--ok); }
+.message-error { border-color: var(--bad); color: var(--bad); }
+
+/* Candidates */
+
+.candidate-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.candidate-card {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.85rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.candidate-photo {
+  width: 72px;
+  height: 72px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--line);
+}
+
+.candidate-body { min-width: 0; }
+
+.candidate-name {
+  margin: 0 0 0.15rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.candidate-name a { text-decoration: none; color: var(--ink); }
+.candidate-name a:hover { color: var(--accent); }
+
+.candidate-snippet { margin: 0.25rem 0 0; }
+
+.candidate-detail-head {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.candidate-detail-photo {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--line);
+}
+
+.candidate-bio { white-space: pre-wrap; }
+
+.sort-bar { margin-top: 0; }
+
+audio {
+  width: 100%;
+  max-width: 34rem;
+  margin: 0.25rem 0 0.5rem;
+}
+
+/* Audition workspace */
+
+.cta { font-size: 1.1rem; font-weight: 600; margin: 1.25rem 0 0.25rem; }
+
+.status-line {
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  margin: 0 0 1rem;
+}
+
+.status-live { border-color: var(--ok); }
+.status-pending { border-color: var(--line); }
+.status-rejected { border-color: var(--bad); }
+
+.preview-banner { border: 1px dashed var(--line); padding: 0.6rem 0.8rem; border-radius: var(--radius); }
+
+.stacked-form { margin: 0 0 1.5rem; }
+
+.stacked-form p { margin: 0 0 1rem; }
+
+.stacked-form label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.2rem;
+}
+
+.stacked-form input[type="text"],
+.stacked-form input[type="email"],
+.stacked-form textarea {
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.stacked-form .helptext {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+}
+
+.stacked-form ul.errorlist {
+  list-style: none;
+  margin: 0 0 0.35rem;
+  padding: 0;
+  color: var(--bad);
+  font-size: 0.9rem;
+}
+
+button {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  color: var(--surface);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.button-quiet {
+  color: var(--ink-soft);
+  background: transparent;
+  border-color: var(--line);
 }

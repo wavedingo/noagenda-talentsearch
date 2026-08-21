@@ -10,9 +10,11 @@
   <header class="site-header">
     <a class="site-title" href="{% url 'core:home' %}">No Agenda Talent Search</a>
     <nav class="site-nav">
+      <a href="{% url 'candidates:list' %}">Candidates</a>
       <a href="{% url 'episodes:list' %}">Episodes</a>
       <a href="{% url 'core:about' %}">About</a>
       {% if user.is_authenticated %}
+        <a href="{% url 'candidates:audition' %}">Audition</a>
         <a href="{% url 'accounts:account' %}">Account</a>
       {% else %}
         <a href="{% url 'accounts:request_link' %}">Log in</a>
@@ -20,6 +22,13 @@
     </nav>
   </header>
   <main class="site-main">
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="message message-{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
     {% block content %}{% endblock %}
   </main>
 </body>
