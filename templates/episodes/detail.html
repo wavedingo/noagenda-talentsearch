@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ episode.episode_number }} — {{ episode.title_display }} — No Agenda Talent Search{% endblock %}
+{% block content %}
+<p class="note"><a href="{% url 'episodes:list' %}">← All episodes</a></p>
+
+<div class="episode-detail-head">
+  {% if episode.artwork_url %}
+    <img class="episode-detail-art" src="{{ episode.artwork_url }}" alt="Artwork for episode {{ episode.episode_number }}" width="160" height="160">
+  {% endif %}
+  <div>
+    <h1>{{ episode.episode_number }} — {{ episode.title_display }}</h1>
+    <p class="episode-meta">
+      {{ episode.published_at|date:"j F Y" }}{% if episode.duration_display %} · {{ episode.duration_display }}{% endif %}
+    </p>
+    {% comment %}
+      Always the show notes page, never the enclosure: the feed's enclosure URL
+      is wrapped in an OP3 analytics prefix and every request through it counts
+      as a download in the show's own stats (spec 3.4).
+    {% endcomment %}
+    <p><a href="{{ episode.link_url }}" rel="noopener">Show notes and audio at noagendanotes.com →</a></p>
+  </div>
+</div>
+
+<h2>Guest hosts</h2>
+{% if episode.feed_guest_hosts %}
+  <p>
+    {% for name in episode.feed_guest_hosts %}{{ name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+  </p>
+  <p class="note">As listed in the show's own feed. Rating guest-host appearances opens once appearance tagging is live.</p>
+{% else %}
+  <p class="empty-state">No guest host on this one.</p>
+{% endif %}
+{% endblock %}
