@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:podcast="https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/1.0.md" version="2.0">
+  <channel>
+    <title>No Agenda Show</title>
+    <link>http://noagendashow.net</link>
+    <description>Deconstructing Media with No Agenda, by Adam Curry and John C. Dvorak</description>
+    <language>en</language>
+    <pubDate>Thu, 20 Aug 2026 21:07:57 +0000</pubDate>
+    <lastBuildDate>Thu, 20 Aug 2026 21:07:57 +0000</lastBuildDate>
+    <itunes:image href="https://noagendaassets.com/enc/1787259573.111_na-1896-art-feed.jpg" />
+    <podcast:liveItem status="ended" start="2026-08-20T17:32:00.000Z" chat="irc.zeronode.net" end="2026-08-20T21:32:00.000Z">
+      <title>No Agenda Episode 1896 - Live</title>
+      <description>&lt;p&gt;&lt;strong&gt;No Agenda Epsiode 1896 Live Thursday August 20th 2026 &lt;/strong&gt;&lt;strong&gt;Living Large and LIT!&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Boost us!&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Get a modern app at podcastapps.com&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;</description>
+      <enclosure length="33" type="audio/mpeg" url="https://op3.dev/e/listen.noagendastream.com/noagenda" />
+      <guid isPermaLink="false">NA-1896 Live</guid>
+      <link>http://trollroom.io</link>
+    </podcast:liveItem>
+    <item>
+      <title>1896 - "Just Dew It"</title>
+      <link>http://1896.noagendanotes.com</link>
+      <guid isPermaLink="true">http://1896.noagendanotes.com</guid>
+      <pubDate>Thu, 20 Aug 2026 20:46:44 +0000</pubDate>
+      <itunes:image href="https://noagendaassets.com/enc/1787259573.111_na-1896-art-feed.jpg" />
+      <enclosure url="https://op3.dev/e/mp3s.nashownotes.com/NA-1896-2026-08-20-Final.mp3" type="audio/mpeg" length="111567101" />
+      <podcast:person href="http://curry.com/" img="https://pbs.twimg.com/profile_images/1401922551161442307/XjN2DdFD_400x400.jpg" group="cast" role="host">Adam Curry</podcast:person>
+      <podcast:person group="cast" role="guest host">Rob Dew</podcast:person>
+      <itunes:duration>9292</itunes:duration>
+    </item>
+    <item>
+      <title>1895 - "XY You're Out"</title>
+      <link>http://1895.noagendanotes.com</link>
+      <guid isPermaLink="true">http://1895.noagendanotes.com</guid>
+      <pubDate>Sun, 16 Aug 2026 21:25:41 +0000</pubDate>
+      <itunes:image href="https://noagendaassets.com/enc/1786916228.136_na-1895-art-feed.jpg" />
+      <enclosure url="https://op3.dev/e/mp3s.nashownotes.com/NA-1895-2026-08-16-Final.mp3" type="audio/mpeg" length="177207039" />
+      <podcast:person href="http://curry.com/" img="https://pbs.twimg.com/profile_images/1401922551161442307/XjN2DdFD_400x400.jpg" group="cast" role="host">Adam Curry</podcast:person>
+      <podcast:person href="http://dvorak.org/blog" img="https://speaking.com/wp-content/uploads/2018/09/John-Dvorak.jpg" group="cast" role="host">John C Dvorak</podcast:person>
+      <itunes:duration>11050</itunes:duration>
+    </item>
+    <item>
+      <title>1890 - "Flock Off!"</title>
+      <description>&lt;div&gt;
+&lt;h2&gt;No Agenda Episode 1890 - "Flock Off!"&lt;/h2&gt;
+&lt;p&gt;Executive Producers:&lt;/p&gt;
+&lt;p&gt;[Donor names trimmed from this fixture -- the real blob runs to hundreds of
+lines of executive-producer credits, knightings, and donor names. It is never
+imported (spec 3.4); a few lines are kept here only so the parser is exercised
+against an item that carries one.]&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://dvorak.org/peerage.htm"&gt;No Agenda Peerage&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;</description>
+      <link>http://1890.noagendanotes.com</link>
+      <guid isPermaLink="true">http://1890.noagendanotes.com</guid>
+      <pubDate>Thu, 30 Jul 2026 22:23:02 +0000</pubDate>
+      <itunes:image href="https://noagendaassets.com/enc/1785450110.038_na-1890-art-feed.jpg" />
+      <enclosure url="https://op3.dev/e/mp3s.nashownotes.com/NA-1890-2026-07-30-Final.mp3" type="audio/mpeg" length="217988298" />
+      <podcast:person href="http://curry.com/" img="https://pbs.twimg.com/profile_images/1401922551161442307/XjN2DdFD_400x400.jpg" group="cast" role="host">Adam Curry</podcast:person>
+      <podcast:person href="http://dvorak.org/blog" img="https://speaking.com/wp-content/uploads/2018/09/John-Dvorak.jpg" group="cast" role="host">John C Dvorak</podcast:person>
+      <itunes:duration>13600</itunes:duration>
+    </item>
+    <item>
+      <title>1889 - "Producer's Tribute to JCD"</title>
+      <link>http://1889.noagendanotes.com</link>
+      <guid isPermaLink="true">http://1889.noagendanotes.com</guid>
+      <pubDate>Mon, 27 Jul 2026 02:40:04 +0000</pubDate>
+      <itunes:image href="https://noagendaassets.com/enc/1785119711.06_na-1889-art-feed.jpg" />
+      <enclosure url="https://op3.dev/e/mp3s.nashownotes.com/NA-1889-2026-07-26-Final.mp3" type="audio/mpeg" length="330611855" />
+      <podcast:person href="http://curry.com/" img="https://pbs.twimg.com/profile_images/1401922551161442307/XjN2DdFD_400x400.jpg" group="cast" role="host">Adam Curry</podcast:person>
+      <podcast:person href="http://dvorak.org/blog" img="https://speaking.com/wp-content/uploads/2018/09/John-Dvorak.jpg" group="cast" role="host">John C Dvorak</podcast:person>
+      <itunes:duration>27547</itunes:duration>
+    </item>
+    <item>
+      <title>1887 - "The Stick Works" </title>
+      <link>http://1887.noagendanotes.com</link>
+      <guid isPermaLink="true">http://1887.noagendanotes.com</guid>
+      <pubDate>Sun, 19 Jul 2026 21:28:18 +0000</pubDate>
+      <itunes:image href="https://noagendaassets.com/enc/1784496399.29_na-1887-art-feed.jpg" />
+      <enclosure url="https://op3.dev/e/mp3s.nashownotes.com/NA-1887-2026-07-19-Final.mp3" type="audio/mpeg" length="130061428" />
+      <podcast:person href="http://curry.com/" img="https://pbs.twimg.com/profile_images/1401922551161442307/XjN2DdFD_400x400.jpg" group="cast" role="host">Adam Curry</podcast:person>
+      <podcast:person href="http://dvorak.org/blog" img="https://speaking.com/wp-content/uploads/2018/09/John-Dvorak.jpg" group="cast" role="host">John C Dvorak</podcast:person>
+      <itunes:duration>10835</itunes:duration>
+    </item>
+    <item>
+      <title>Bonus - No Number In This Title</title>
+      <link>http://bonus.noagendanotes.com</link>
+      <guid isPermaLink="true">http://bonus.noagendanotes.com</guid>
+      <pubDate>Thu, 21 Aug 2026 10:00:00 +0000</pubDate>
+      <enclosure url="https://op3.dev/e/mp3s.nashownotes.com/NA-bonus.mp3" type="audio/mpeg" length="1000" />
+      <itunes:duration>600</itunes:duration>
+    </item>
+  </channel>
+</rss>
