@@ -1,15 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>No Agenda Talent Search</h1>
-<p>The community-driven audition for the show's next co-host.</p>
+<p class="page-intro">The community-driven audition for the show's next co-host.</p>
+
 {% if user.is_authenticated %}
-  <p>Signed in as {{ user.email }}. <a href="{% url 'accounts:account' %}">Your account</a></p>
-  <form method="post" action="{% url 'accounts:logout' %}">
-    {% csrf_token %}
-    <button type="submit">Log out</button>
-  </form>
+  <div class="note">
+    Signed in as {{ user.email }}.
+    <form method="post" action="{% url 'accounts:logout' %}" style="display:inline">
+      {% csrf_token %}
+      <button type="submit">Log out</button>
+    </form>
+  </div>
 {% else %}
   <p><a href="{% url 'accounts:request_link' %}">Log in or sign up</a></p>
 {% endif %}
-<p><a href="{% url 'core:about' %}">About</a></p>
+
+{% if latest_episodes %}
+  <h2>Latest episodes</h2>
+  <ul class="episode-list">
+    {% for episode in latest_episodes %}
+      <li class="episode-card">
+        {% if episode.artwork_url %}
+          <img class="episode-art" src="{{ episode.artwork_url }}" alt="" loading="lazy" width="72" height="72">
+        {% else %}
+          <span class="episode-art" aria-hidden="true"></span>
+        {% endif %}
+        <div class="episode-body">
+          <p class="episode-title">
+            <a href="{% url 'episodes:detail' episode.episode_number %}">{{ episode.episode_number }} — {{ episode.title_display }}</a>
+          </p>
+          <p class="episode-meta">{{ episode.published_at|date:"j F Y" }}</p>
+          {% if episode.feed_guest_hosts %}
+            <span class="badge">Guest host: {{ episode.feed_guest_hosts|join:", " }}</span>
+          {% endif %}
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+  <p><a href="{% url 'episodes:list' %}">All episodes →</a></p>
+{% endif %}
 {% endblock %}

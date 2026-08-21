@@ -1,10 +1,26 @@
-<!DOCTYPE html>
+{% load static %}<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}No Agenda Talent Search{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
 </head>
 <body>
-  {% block content %}{% endblock %}
+  <header class="site-header">
+    <a class="site-title" href="{% url 'core:home' %}">No Agenda Talent Search</a>
+    <nav class="site-nav">
+      <a href="{% url 'episodes:list' %}">Episodes</a>
+      <a href="{% url 'core:about' %}">About</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'accounts:account' %}">Account</a>
+      {% else %}
+        <a href="{% url 'accounts:request_link' %}">Log in</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main class="site-main">
+    {% block content %}{% endblock %}
+  </main>
 </body>
 </html>
