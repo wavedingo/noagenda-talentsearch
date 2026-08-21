@@ -22,6 +22,29 @@ services:
         value: "No Agenda Talent Search <hello@noagendatalentsearch.com>"
       - key: RESEND_API_KEY
         sync: false
+      - key: RSS_FEED_URL
+        value: https://feeds.noagendaassets.com/noagenda.xml
+
+  - type: cron
+    name: rss-sync
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    schedule: "*/30 * * * *"
+    dockerCommand: python manage.py rss_sync
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: noagendatalentsearch-db
+          property: connectionString
+      - key: SECRET_KEY
+        fromService:
+          name: noagendatalentsearch
+          type: web
+          envVarKey: SECRET_KEY
+      - key: APP_ENV
+        value: production
+      - key: RSS_FEED_URL
+        value: https://feeds.noagendaassets.com/noagenda.xml
 
 databases:
   - name: noagendatalentsearch-db
