@@ -364,17 +364,17 @@ Ordered setup guide. Steps 1–4 are producer tasks (accounts, DNS, credentials)
 - [x] Cloudflare adds the MX and SPF records automatically — accept them.
 
 **Outbound (magic links, moderation notices):** still outstanding as of 2026-08-20. App-side wiring is ready and waiting (`RESEND_API_KEY` set → `config/settings.py` switches from console-log backend to Resend's SMTP relay automatically, no redeploy needed beyond setting the var) — nothing below is done yet.
-- [ ] Create a **Resend** account (free tier covers ~3,000 emails/month; upgrade later as signups grow).
-- [ ] Add and verify the domain in Resend; add the DKIM and SPF records it provides to Cloudflare DNS.
-- [ ] Set the sending identity to `No Agenda Talent Search <hello@noagendatalentsearch.com>`.
-- [ ] Generate an API key. Save it.
+- [x] Create a **Resend** account (free tier covers ~3,000 emails/month; upgrade later as signups grow).
+- [x] Add and verify the domain in Resend; add the DKIM and SPF records it provides to Cloudflare DNS.
+- [x] Set the sending identity to `No Agenda Talent Search <hello@noagendatalentsearch.com>`.
+- [x] Generate an API key. Save it.
 - [ ] **Warning:** magic-link auth means email deliverability *is* login. Verify DKIM/SPF pass before launch (send a test to Gmail, Outlook, Yahoo, and Proton and check each lands in the inbox, not spam).
 
 ## A.3 App Hosting (Render)
 
-- [ ] Create a Render account, connect it to GitHub.
-- [ ] Create a **Web Service** from the repo (Claude Code will provide a Dockerfile — use Docker runtime so `ffmpeg` is available).
-- [ ] Create a **Render Postgres** instance (starter tier is plenty). Copy the internal connection string.
+- [x] Create a Render account, connect it to GitHub.
+- [x] Create a **Web Service** from the repo (Claude Code will provide a Dockerfile — use Docker runtime so `ffmpeg` is available).
+- [x] Create a **Render Postgres** instance (starter tier is plenty). Copy the internal connection string.
 - [ ] Create three **Cron Jobs** (all declared in `render.yaml`, so a Blueprint deploy creates them):
   - `rss-sync` — every 30 min (`*/30 * * * *`)
   - `process-demos` — every 15 min (`*/15 * * * *`); the transcode backstop, not the normal path — uploads transcode immediately in a background thread, and this only picks up what a deploy or crash abandoned
