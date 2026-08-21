@@ -24,6 +24,19 @@ services:
         sync: false
       - key: RSS_FEED_URL
         value: https://feeds.noagendaassets.com/noagenda.xml
+      # Object storage (spec A.4). Until all five are set the app falls back to
+      # local disk, which on Render means uploads vanish on the next deploy --
+      # so these are the variables to set before opening auditions.
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET
+        value: nats-media
+      - key: R2_PUBLIC_BASE_URL
+        value: https://media.noagendatalentsearch.com
 
   - type: cron
     name: rss-sync
@@ -45,6 +58,40 @@ services:
         value: production
       - key: RSS_FEED_URL
         value: https://feeds.noagendaassets.com/noagenda.xml
+
+  # Demos normally transcode in a background thread the moment they're uploaded.
+  # This is the backstop: it requeues anything a deploy or crash abandoned
+  # mid-transcode and drains whatever is waiting. Quarter-hourly rather than
+  # per-minute because nothing routine depends on it -- a demo waits on a human
+  # moderator anyway, and each cron run is a billed container start.
+  - type: cron
+    name: process-demos
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    schedule: "*/15 * * * *"
+    dockerCommand: python manage.py process_demos
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: noagendatalentsearch-db
+          property: connectionString
+      - key: SECRET_KEY
+        fromService:
+          name: noagendatalentsearch
+          type: web
+          envVarKey: SECRET_KEY
+      - key: APP_ENV
+        value: production
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET
+        value: nats-media
+      - key: R2_PUBLIC_BASE_URL
+        value: https://media.noagendatalentsearch.com
 
 databases:
   - name: noagendatalentsearch-db
