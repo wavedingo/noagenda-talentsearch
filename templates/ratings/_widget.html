@@ -1,0 +1,27 @@
+{% if widget.summary %}
+  <p class="rating-summary">
+    {{ widget.summary.average|floatformat:1 }} ★
+    · {{ widget.summary.count }} rating{{ widget.summary.count|pluralize }}
+  </p>
+{% else %}
+  <p class="note">Not enough ratings yet</p>
+{% endif %}
+
+{% if widget.closed %}
+  {% if widget.closed_copy %}<p class="note">{{ widget.closed_copy }}</p>{% endif %}
+{% elif widget.login_required %}
+  <p class="note"><a href="{% url 'accounts:request_link' %}">Log in to rate</a></p>
+{% elif not widget.eligible %}
+  <p class="note">New accounts wait a little before rating. You can rate from {{ widget.eligible_at|date:"j M Y, H:i" }} UTC.</p>
+{% else %}
+  <form method="post" action="{% url 'ratings:rate' %}" class="star-form">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+    <input type="hidden" name="rateable_type" value="{{ widget.rateable_type }}">
+    <input type="hidden" name="rateable_id" value="{{ widget.rateable_id }}">
+    <p class="note star-legend">{% if widget.user_stars %}Your rating: {{ widget.user_stars }} star{{ widget.user_stars|pluralize }}{% else %}Rate this{% endif %}</p>
+    {% for n in widget.stars %}
+      <button type="submit" name="stars" value="{{ n }}" class="star{% if widget.user_stars >= n %} star-on{% endif %}" aria-label="{{ n }} star{{ n|pluralize }}">★</button>
+    {% endfor %}
+  </form>
+{% endif %}

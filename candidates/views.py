@@ -1,11 +1,15 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db.models import F
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from core.settings_util import get_setting
+from ratings.models import Rating
+from ratings.services import load_user_stars
+from ratings.widgets import build_widget
 
 from . import services
 from .audio import DemoValidationError
@@ -18,13 +22,14 @@ CANDIDATES_PER_PAGE = 24
 SORTS = {
     "newest": ("-approved_at", "-created_at"),
     "name": ("stage_name",),
+    "top": (F("demo_score").desc(nulls_last=True), "-approved_at"),
 }
 DEFAULT_SORT = "newest"
 
 
 def candidate_list(request):
-    """Approved candidates only. Spec 6 lists a third sort, "top demos", which
-    needs the Phase 4 scoring columns to mean anything — it lands with them."""
+    """Approved candidates only. Default is newest so early leaders don't
+    entrench; `top` is smoothed live-demo score from the scoring job."""
     sort = request.GET.get("sort", DEFAULT_SORT)
     if sort not in SORTS:
         sort = DEFAULT_SORT
@@ -43,10 +48,39 @@ def candidate_detail(request, slug):
     if not candidate.is_public and not (is_owner or _is_moderator(request.user)):
         raise Http404("No such candidate")
     demo = candidate.live_demo
+    appearances = list(
+        candidate.appearances.select_related("episode").order_by("-episode__published_at")
+    )
+    demo_stars = load_user_stars(
+        request.user, Rating.RateableType.DEMO, [demo.pk] if demo else []
+    )
+    appearance_stars = load_user_stars(
+        request.user, Rating.RateableType.APPEARANCE, [a.pk for a in appearances]
+    )
+    demo_widget = (
+        build_widget(request.user, Rating.RateableType.DEMO, demo, demo_stars.get(demo.pk))
+        if demo
+        else None
+    )
+    appearance_widgets = [
+        (appearance, build_widget(
+            request.user,
+            Rating.RateableType.APPEARANCE,
+            appearance,
+            appearance_stars.get(appearance.pk),
+        ))
+        for appearance in appearances
+    ]
     return render(
         request,
         "candidates/detail.html",
-        {"candidate": candidate, "demo": demo, "is_owner": is_owner},
+        {
+            "candidate": candidate,
+            "demo": demo,
+            "is_owner": is_owner,
+            "demo_widget": demo_widget,
+            "appearance_widgets": appearance_widgets,
+        },
     )
 
 

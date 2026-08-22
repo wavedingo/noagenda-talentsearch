@@ -22,12 +22,29 @@
 </div>
 
 <h2>Guest hosts</h2>
-{% if episode.feed_guest_hosts %}
-  <p>
-    {% for name in episode.feed_guest_hosts %}{{ name }}{% if not forloop.last %}, {% endif %}{% endfor %}
-  </p>
-  <p class="note">As listed in the show's own feed. Rating guest-host appearances opens once appearance tagging is live.</p>
+{% if appearance_widgets %}
+  <ul class="appearance-list">
+    {% for appearance, widget in appearance_widgets %}
+      <li class="appearance-card">
+        <p>
+          {% if appearance.candidate %}
+            <a href="{% url 'candidates:detail' appearance.candidate.slug %}">{{ appearance.display_name }}</a>
+          {% else %}
+            {{ appearance.display_name }}
+          {% endif %}
+        </p>
+        {% if appearance.admin_note %}<p class="note">{{ appearance.admin_note }}</p>{% endif %}
+        {% if appearance.candidate and appearance.candidate.live_demo %}
+          <p class="note"><a href="{% url 'candidates:detail' appearance.candidate.slug %}">Profile and demo →</a></p>
+        {% endif %}
+        {% include "ratings/_widget.html" %}
+      </li>
+    {% endfor %}
+  </ul>
 {% else %}
-  <p class="empty-state">No guest host on this one.</p>
+  <p class="empty-state">No guest host tagged on this one yet.</p>
+{% endif %}
+{% if episode.feed_guest_hosts %}
+  <p class="note">As listed in the show's own feed: {{ episode.feed_guest_hosts|join:", " }}.</p>
 {% endif %}
 {% endblock %}

@@ -3,6 +3,9 @@ from django.http import Http404
 from django.shortcuts import render
 
 from core.settings_util import get_setting
+from ratings.models import Rating
+from ratings.services import load_user_stars
+from ratings.widgets import build_widget
 
 from .models import Episode
 
@@ -23,7 +26,32 @@ def episode_detail(request, number):
     # The episode number is derived/display-only (spec 3.4), so it isn't the
     # lookup key in the database -- but it is the stable, shareable thing to
     # put in a URL. Duplicates would be a feed bug; newest wins if one appears.
-    episode = Episode.objects.filter(episode_number=number).order_by("-published_at").first()
+    episode = (
+        Episode.objects.filter(episode_number=number)
+        .prefetch_related("appearances__candidate")
+        .order_by("-published_at")
+        .first()
+    )
     if episode is None:
         raise Http404("No such episode")
-    return render(request, "episodes/detail.html", {"episode": episode})
+    appearances = list(episode.appearances.all())
+    stars = load_user_stars(
+        request.user, Rating.RateableType.APPEARANCE, [a.pk for a in appearances]
+    )
+    appearance_widgets = [
+        (
+            appearance,
+            build_widget(
+                request.user,
+                Rating.RateableType.APPEARANCE,
+                appearance,
+                stars.get(appearance.pk),
+            ),
+        )
+        for appearance in appearances
+    ]
+    return render(
+        request,
+        "episodes/detail.html",
+        {"episode": episode, "appearance_widgets": appearance_widgets},
+    )

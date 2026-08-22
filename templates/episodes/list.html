@@ -23,8 +23,8 @@
           <p class="episode-meta">
             {{ episode.published_at|date:"j F Y" }}{% if episode.duration_display %} · {{ episode.duration_display }}{% endif %}
           </p>
-          {% if episode.appearances.all or episode.feed_guest_hosts %}
-            <span class="badge">Guest host{% if episode.feed_guest_hosts %}: {{ episode.feed_guest_hosts|join:", " }}{% endif %}</span>
+          {% if episode.appearances.all %}
+            <span class="badge">Guest host: {% for appearance in episode.appearances.all %}{{ appearance.display_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
           {% endif %}
         </div>
       </li>

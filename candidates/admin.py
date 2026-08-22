@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.db.models import F
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import path, reverse
@@ -64,6 +65,11 @@ class CandidateAdmin(ModeratorVisibleAdmin):
                 "queue/process-demos/",
                 self.admin_site.admin_view(self.process_demos_view),
                 name="candidates_process_demos",
+            ),
+            path(
+                "rankings/",
+                self.admin_site.admin_view(self.rankings_view),
+                name="candidates_rankings",
             ),
         ] + super().get_urls()
 
@@ -158,6 +164,22 @@ class CandidateAdmin(ModeratorVisibleAdmin):
             level=messages.WARNING if failed else messages.SUCCESS,
         )
         return HttpResponseRedirect(reverse("admin:candidates_moderation_queue"))
+
+    def rankings_view(self, request):
+        """Full rankings with raw vs. smoothed scores (spec 4). Public pages
+        never get this list — only the top N by composite."""
+        live = Candidate.objects.filter(status=Candidate.Status.LIVE).order_by(
+            F("composite_score").desc(nulls_last=True),
+            F("demo_score").desc(nulls_last=True),
+            "stage_name",
+        )
+        context = {
+            **self.admin_site.each_context(request),
+            "title": "Full rankings",
+            "candidates": live,
+            "opts": self.model._meta,
+        }
+        return render(request, "admin/candidates/rankings.html", context)
 
 
 @admin.register(Demo)

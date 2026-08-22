@@ -333,3 +333,44 @@ button {
   background: transparent;
   border-color: var(--line);
 }
+
+.favorites-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.appearance-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.appearance-card {
+  padding: 0.85rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.rating-summary { margin: 0.35rem 0 0.15rem; font-weight: 600; }
+
+.star-form { margin: 0.4rem 0 0; }
+
+.star-legend { margin: 0 0 0.35rem; }
+
+.star-form button.star {
+  font-size: 1.45rem;
+  line-height: 1;
+  padding: 0.4rem 0.55rem;
+  color: var(--ink-soft);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  margin: 0 0.15rem 0.15rem 0;
+}
+
+.star-form button.star-on { color: var(--accent); border-color: var(--accent); }

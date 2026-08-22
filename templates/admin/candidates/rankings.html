@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<p class="help">
+  Every live candidate, with raw averages next to the Bayesian scores the public
+  board uses. This list is not public — the site only ever shows the top of it.
+</p>
+<table class="listing">
+  <thead>
+    <tr>
+      <th>Candidate</th>
+      <th>Demo avg</th>
+      <th>Demo votes</th>
+      <th>Demo score</th>
+      <th>Appearance score</th>
+      <th>Composite</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for candidate in candidates %}
+      <tr>
+        <td><a href="{% url 'admin:candidates_candidate_change' candidate.pk %}">{{ candidate.stage_name }}</a></td>
+        <td>
+          {% with demo=candidate.live_demo %}
+            {% if demo and demo.rating_avg is not None %}{{ demo.rating_avg|floatformat:2 }}{% else %}—{% endif %}
+          {% endwith %}
+        </td>
+        <td>
+          {% with demo=candidate.live_demo %}
+            {% if demo %}{{ demo.rating_count }}{% else %}—{% endif %}
+          {% endwith %}
+        </td>
+        <td>{% if candidate.demo_score is not None %}{{ candidate.demo_score|floatformat:3 }}{% else %}—{% endif %}</td>
+        <td>{% if candidate.appearance_score is not None %}{{ candidate.appearance_score|floatformat:3 }}{% else %}—{% endif %}</td>
+        <td>{% if candidate.composite_score is not None %}{{ candidate.composite_score|floatformat:3 }}{% else %}—{% endif %}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6">No live candidates.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

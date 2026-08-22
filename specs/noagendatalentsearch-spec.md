@@ -394,8 +394,12 @@ one, which would mean moving the custom domain and reissuing its certificate.
     audio to a cron container's disk, which is discarded when the job exits. The
     transcode backstop, not the normal path: uploads transcode immediately in a
     background thread, and this only picks up what a deploy or crash abandoned.
-  - `recompute-scores` — hourly (`0 * * * *`) — **do not create yet**; the command
-    lands with Phase 4 and would fail hourly until then.
+  - `recompute-scores` — hourly (`0 * * * *`), `python manage.py recompute_scores`.
+    **Create this in the dashboard when Phase 4 lands** (same as the other two:
+    the Blueprint is not the live source of truth). Needs `DATABASE_URL`,
+    `SECRET_KEY`, `APP_ENV=production`. The job writes denormalized scores;
+    page loads never compute them. A successful rating or appearance tag also
+    runs it in-process, so the cron is the backstop for bans and settings changes.
 - [x] Add the custom domain `noagendatalentsearch.com` in Render; it will supply a CNAME/A target to add in Cloudflare DNS.
 - [x] In Cloudflare, add that record with proxy **enabled** (orange cloud).
 - [x] Enable **auto-deploy on push to `main`**.
@@ -466,7 +470,7 @@ SCORE_WEIGHT_DEMO=0.3
 - [x] Initialize repo with `.gitignore` covering `.env`, uploads, and build artifacts.
 - [x] Commit a `.env.example` listing every variable above with placeholder values.
 - [x] Dockerfile installs `ffmpeg` (needed for `ffprobe` validation and transcoding).
-- [ ] Add `render.yaml` (Render Blueprint) declaring the web service, Postgres, and both cron jobs so the infrastructure is reproducible. **Partial:** web service + Postgres + the `rss-sync` (every 30 min) and `process-demos` (every 15 min) crons are declared; `recompute-scores` cron lands with Phase 4.
+- [ ] Add `render.yaml` (Render Blueprint) declaring the web service, Postgres, and both cron jobs so the infrastructure is reproducible. **Partial:** web service + Postgres + `rss-sync`, `process-demos`, and `recompute-scores` are declared in the file; adopting the Blueprint is still an open decision, so the live crons are created by hand in the dashboard.
 - [x] Add a `/healthz` endpoint returning app + DB status.
 - [x] Migrations run automatically on deploy (via `render.yaml`'s `preDeployCommand`).
 - [x] Add a seed/CLI command to promote a user to admin by email (`manage.py make_admin <email>`) — needed to bootstrap the first admin account.

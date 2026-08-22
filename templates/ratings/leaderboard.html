@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Community favorites — No Agenda Talent Search{% endblock %}
+{% block content %}
+<h1>Community favorites</h1>
+<p class="page-intro">
+  Producers float the candidates they connect with. These standings inform the
+  show's decision; they don't make it.
+</p>
+
+<h2>On the show</h2>
+{% if favorites %}
+  <ul class="favorites-list">
+    {% for candidate in favorites %}
+      <li class="candidate-card">
+        {% include "ratings/_candidate_card.html" %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="empty-state">
+    The main board fills in once guest hosts start appearing on the show.
+    Until then, Rising Demos below is the list to watch.
+  </p>
+{% endif %}
+
+<h2>Rising demos</h2>
+<p class="note">Candidates who haven't guest-hosted yet, ordered by how their demo is landing.</p>
+{% if rising %}
+  <ul class="favorites-list">
+    {% for candidate in rising %}
+      <li class="candidate-card">
+        {% include "ratings/_candidate_card.html" %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="empty-state">No live demos to float yet.</p>
+{% endif %}
+{% endblock %}

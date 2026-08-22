@@ -1,0 +1,11 @@
+{% if candidate.photo_url %}
+  <img class="candidate-photo" src="{{ candidate.photo_url }}" alt="" loading="lazy" width="72" height="72">
+{% else %}
+  <span class="candidate-photo" aria-hidden="true"></span>
+{% endif %}
+<div class="candidate-body">
+  <p class="candidate-name">
+    <a href="{% url 'candidates:detail' candidate.slug %}">{{ candidate.stage_name }}</a>
+  </p>
+  {% if candidate.is_featured %}<span class="badge">Featured</span>{% endif %}
+</div>

@@ -51,12 +51,22 @@ class EpisodeListTests(TestCase):
         self.assertContains(response, "isn't a full archive")
         self.assertContains(response, "1890")
 
-    def test_guest_host_badge(self):
+    def test_guest_host_badge_is_for_tagged_appearances_not_feed_names(self):
+        from ratings.models import Appearance
+
         make_episode(1896, feed_guest_hosts=["Rob Dew"])
-        make_episode(1895)
+        tagged = make_episode(1895)
+        Appearance.objects.create(
+            episode=tagged,
+            guest_name="A Candidate",
+            rateable_until=timezone.now(),
+        )
         response = self.client.get(reverse("episodes:list"))
-        self.assertContains(response, "Guest host: Rob Dew")
-        self.assertEqual(response.content.decode().count("badge"), 1)
+        body = response.content.decode()
+        self.assertIn("Guest host: A Candidate", body)
+        # Feed-declared names are not the badge — tagging is (Phase 2 decision 2).
+        self.assertEqual(body.count("badge"), 1)
+        self.assertNotIn("Guest host: Rob Dew", body)
 
     def test_never_renders_the_op3_enclosure_url(self):
         # Every request through the OP3 prefix registers as a download in the
@@ -81,7 +91,7 @@ class EpisodeDetailTests(TestCase):
     def test_empty_guest_host_state(self):
         make_episode(1895)
         response = self.client.get(reverse("episodes:detail", args=[1895]))
-        self.assertContains(response, "No guest host on this one")
+        self.assertContains(response, "No guest host tagged on this one yet.")
 
     def test_never_renders_the_op3_enclosure_url(self):
         make_episode(1896)

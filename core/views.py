@@ -2,26 +2,28 @@ from django.db import connection
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from candidates.models import Candidate
 from episodes.models import Episode
+from ratings.services import community_favorites, rising_demos
 
 from .settings_util import get_setting
 
 
 HOME_EPISODE_COUNT = 3
-HOME_CANDIDATE_COUNT = 4
+HOME_FAVORITE_COUNT = 4
 
 
 def home(request):
-    live_candidates = Candidate.objects.filter(status=Candidate.Status.LIVE).order_by(
-        "-approved_at", "-created_at"
-    )
+    favorites = community_favorites()[:HOME_FAVORITE_COUNT]
+    # Rising Demos stand in until someone has been tagged on an episode, so
+    # the home page isn't an empty "community favorites" heading.
+    rising = [] if favorites else rising_demos()[:HOME_FAVORITE_COUNT]
     return render(
         request,
         "core/home.html",
         {
-            "latest_episodes": Episode.objects.all()[:HOME_EPISODE_COUNT],
-            "latest_candidates": live_candidates[:HOME_CANDIDATE_COUNT],
+            "latest_episodes": Episode.objects.prefetch_related("appearances").all()[:HOME_EPISODE_COUNT],
+            "favorites": favorites,
+            "rising": rising,
             "auditions_open": get_setting("auditions_open"),
         },
     )

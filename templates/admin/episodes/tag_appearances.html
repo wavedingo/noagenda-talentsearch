@@ -1,0 +1,104 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<p>
+  <a href="{% url 'admin:episodes_episode_changelist' %}">← Episodes</a>
+  · {{ episode.episode_number }} — {{ episode.title_display }}
+</p>
+<p class="help">
+  Tagging opens a rating window from the episode's publish date. An unlinked name
+  (someone who hasn't auditioned here) can be rated immediately; linking a
+  candidate later carries those ratings over.
+</p>
+
+{% if suggestions %}
+  <h2>Listed in the feed, not yet tagged</h2>
+  <ul>
+    {% for name in suggestions %}
+      <li>
+        {{ name }}
+        <form method="post" action="{% url 'admin:episodes_appearance_tag' episode.pk %}" style="display:inline">
+          {% csrf_token %}
+          <input type="hidden" name="guest_name" value="{{ name }}">
+          <button type="submit">Tag as appearance</button>
+        </form>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<h2>Tagged appearances</h2>
+{% if appearances %}
+  <table class="listing">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Candidate</th>
+        <th>Rateable until</th>
+        <th>Votes</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for appearance in appearances %}
+        <tr>
+          <td>{{ appearance.guest_name }}</td>
+          <td>
+            {% if appearance.candidate %}
+              {{ appearance.candidate.stage_name }}
+            {% else %}
+              <form method="post" action="{% url 'admin:episodes_appearance_link' episode.pk %}">
+                {% csrf_token %}
+                <input type="hidden" name="appearance_id" value="{{ appearance.pk }}">
+                <select name="candidate_id" required>
+                  <option value="">Link a candidate…</option>
+                  {% for candidate in live_candidates %}
+                    <option value="{{ candidate.pk }}">{{ candidate.stage_name }}</option>
+                  {% endfor %}
+                </select>
+                <button type="submit">Link</button>
+              </form>
+            {% endif %}
+          </td>
+          <td>{{ appearance.rateable_until }}</td>
+          <td>{{ appearance.rating_count }}</td>
+          <td>
+            <form method="post" action="{% url 'admin:episodes_appearance_untag' episode.pk %}" onsubmit="return confirm('Remove this appearance and its ratings?');">
+              {% csrf_token %}
+              <input type="hidden" name="appearance_id" value="{{ appearance.pk }}">
+              <button type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No appearances tagged on this episode yet.</p>
+{% endif %}
+
+<h2>Tag someone</h2>
+<form method="post" action="{% url 'admin:episodes_appearance_tag' episode.pk %}">
+  {% csrf_token %}
+  <p>
+    <label>Guest name (if they don't have a profile here)<br>
+      <input type="text" name="guest_name" maxlength="100">
+    </label>
+  </p>
+  <p>
+    <label>Or a live candidate<br>
+      <select name="candidate">
+        <option value="">—</option>
+        {% for candidate in live_candidates %}
+          <option value="{{ candidate.pk }}">{{ candidate.stage_name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </p>
+  <p>
+    <label>Note (optional)<br>
+      <input type="text" name="admin_note" maxlength="500" style="width:28rem">
+    </label>
+  </p>
+  <p><button type="submit">Tag appearance</button></p>
+</form>
+{% endblock %}

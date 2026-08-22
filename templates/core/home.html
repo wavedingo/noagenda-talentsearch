@@ -25,25 +25,19 @@
   <p><a href="{% url 'accounts:request_link' %}">Log in or sign up</a></p>
 {% endif %}
 
-{% if latest_candidates %}
-  <h2>Recently approved candidates</h2>
+{% if favorites or rising %}
+  <h2>{% if favorites %}Community favorites{% else %}Rising demos{% endif %}</h2>
+  {% if not favorites %}
+    <p class="note">The main board fills in once guest hosts start appearing on the show.</p>
+  {% endif %}
   <ul class="candidate-grid">
-    {% for candidate in latest_candidates %}
+    {% for candidate in favorites|default:rising %}
       <li class="candidate-card">
-        {% if candidate.photo_url %}
-          <img class="candidate-photo" src="{{ candidate.photo_url }}" alt="" loading="lazy" width="72" height="72">
-        {% else %}
-          <span class="candidate-photo" aria-hidden="true"></span>
-        {% endif %}
-        <div class="candidate-body">
-          <p class="candidate-name">
-            <a href="{% url 'candidates:detail' candidate.slug %}">{{ candidate.stage_name }}</a>
-          </p>
-        </div>
+        {% include "ratings/_candidate_card.html" %}
       </li>
     {% endfor %}
   </ul>
-  <p><a href="{% url 'candidates:list' %}">All candidates →</a></p>
+  <p><a href="{% url 'ratings:leaderboard' %}">All favorites →</a></p>
 {% endif %}
 
 {% if latest_episodes %}
@@ -61,8 +55,8 @@
             <a href="{% url 'episodes:detail' episode.episode_number %}">{{ episode.episode_number }} — {{ episode.title_display }}</a>
           </p>
           <p class="episode-meta">{{ episode.published_at|date:"j F Y" }}</p>
-          {% if episode.feed_guest_hosts %}
-            <span class="badge">Guest host: {{ episode.feed_guest_hosts|join:", " }}</span>
+          {% if episode.appearances.all %}
+            <span class="badge">Guest host: {% for appearance in episode.appearances.all %}{{ appearance.display_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
           {% endif %}
         </div>
       </li>

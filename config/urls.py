@@ -9,6 +9,7 @@ urlpatterns = [
     path("", include("accounts.urls")),
     path("", include("episodes.urls")),
     path("", include("candidates.urls")),
+    path("", include("ratings.urls")),
 ]
 
 if settings.DEBUG and not settings.USE_R2:

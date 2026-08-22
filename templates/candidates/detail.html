@@ -36,12 +36,29 @@
   {% endcomment %}
   <audio controls preload="none" src="{{ demo.stream_url }}"></audio>
   {% if demo.duration_display %}<p class="note">{{ demo.duration_display }} long.</p>{% endif %}
+  {% if demo.is_public %}{% include "ratings/_widget.html" with widget=demo_widget %}{% endif %}
 {% else %}
   <p class="empty-state">No demo published yet.</p>
 {% endif %}
 
 <h2>On the show</h2>
+{% if appearance_widgets %}
+  <ul class="appearance-list">
+    {% for appearance, widget in appearance_widgets %}
+      <li class="appearance-card">
+        <p>
+          <a href="{% url 'episodes:detail' appearance.episode.episode_number %}">
+            {{ appearance.episode.episode_number }} — {{ appearance.episode.title_display }}
+          </a>
+        </p>
+        <p class="note">{{ appearance.episode.published_at|date:"j F Y" }}</p>
+        {% include "ratings/_widget.html" %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
 <p class="empty-state">
-  Guest-host appearances and their ratings appear here once appearance tagging is live.
+  Guest-host appearances and their ratings appear here once this candidate has been on the show.
 </p>
+{% endif %}
 {% endblock %}

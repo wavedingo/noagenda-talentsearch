@@ -24,7 +24,7 @@ and write moderation notices like a person wrote them.
 | 1 | Scaffold, schema, magic-link auth, admin role | Done |
 | 2 | RSS sync, episode pages | Done |
 | 3 | Auditions: profile CRUD, mp3 pipeline, moderation queue, candidate pages | Done |
-| 4 | Ratings, appearance tagging, Bayesian scoring, leaderboard | Next |
+| 4 | Ratings, appearance tagging, Bayesian scoring, leaderboard | Next (this branch) |
 | 5 | Reports, rate limits, Turnstile, analytics, audit log, backups, deploy | |
 
 Each phase ends deployable. Read the previous phase's plan doc for its handoff notes

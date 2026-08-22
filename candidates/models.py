@@ -103,6 +103,11 @@ class Candidate(RejectableMixin):
     updated_at = models.DateTimeField(auto_now=True)
     approved_at = models.DateTimeField(null=True, blank=True)
 
+    # Written by ratings.scoring.recompute_scores, never on page load.
+    demo_score = models.FloatField(null=True, blank=True)
+    appearance_score = models.FloatField(null=True, blank=True)
+    composite_score = models.FloatField(null=True, blank=True)
+
     class Meta:
         ordering = ["-created_at"]
 
@@ -179,6 +184,10 @@ class Demo(RejectableMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     approved_at = models.DateTimeField(null=True, blank=True)
+
+    rating_avg = models.FloatField(null=True, blank=True)
+    rating_count = models.PositiveIntegerField(default=0)
+    smoothed_score = models.FloatField(null=True, blank=True)
 
     class Meta:
         ordering = ["-created_at"]
