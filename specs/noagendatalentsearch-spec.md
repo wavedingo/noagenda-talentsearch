@@ -383,13 +383,12 @@ below have to be created by hand. Adopting the Blueprint later is an open
 decision; it may create duplicate services rather than take over the running
 one, which would mean moving the custom domain and reissuing its certificate.
 
-- [ ] Create two **Cron Jobs** by hand (Docker runtime, same repo). Each is a
+- [x] Create two **Cron Jobs** by hand (Docker runtime, same repo). Each is a
       separate container and inherits nothing from the web service, so both need
       `DATABASE_URL` (the same Postgres), a matching `SECRET_KEY`, and
       `APP_ENV=production`:
   - `rss-sync` — every 30 min (`*/30 * * * *`), `python manage.py rss_sync`. Also
-    needs `RSS_FEED_URL`. Confirmed not yet running: the production episodes page
-    still reads "No episodes synced yet".
+    needs `RSS_FEED_URL`. Confirmed running: production lists episodes from 1890 up.
   - `process-demos` — every 15 min (`*/15 * * * *`), `python manage.py process_demos`.
     Also needs all five `R2_*` vars — miss one and it silently writes transcoded
     audio to a cron container's disk, which is discarded when the job exits. The
@@ -403,13 +402,17 @@ one, which would mean moving the custom domain and reissuing its certificate.
 
 ## A.4 Object Storage (Cloudflare R2)
 
-- [ ] Create an R2 bucket: `nats-media`.
-- [ ] Create an **R2 API token** scoped to that bucket (Object Read & Write). Save the access key ID, secret, and account ID.
-- [ ] Connect a public custom domain for reads: `media.noagendatalentsearch.com`.
-- [ ] Set a bucket CORS policy allowing GET from the site origin.
+- [x] Create an R2 bucket: `nats-media`.
+- [x] Create an **R2 API token** scoped to that bucket (Object Read & Write). Save the access key ID, secret, and account ID.
+- [x] Connect a public custom domain for reads: `media.noagendatalentsearch.com`.
+- [x] Bucket CORS policy — **not required, deliberately skipped.** CORS governs
+      cross-origin requests made by *scripts*; this site has no JavaScript at all
+      and plays demos with plain `<audio src>` elements, which are not subject to
+      it. Uploads are server-side, so a browser never talks to R2 directly.
+      Revisit only if something like a waveform display or Web Audio is added.
 - [ ] Confirm uploads go *only* through the app (signed server-side); the public domain is read-only.
-- [ ] **Block `/private/*` on `media.noagendatalentsearch.com`** with a Cloudflare rule. The app writes original uploads under a `private/` key prefix and never links to them, but an R2 custom domain serves the whole bucket — and unlike the streaming copy, the original still carries the uploader's ID3 tags. The keys are UUIDs so nothing is enumerable, but this is the belt to that braces.
-- [ ] Set the five `R2_*` variables on **both** the web service and the `process-demos` cron. The app falls back to local disk if any one of them is missing, which on Render means uploads disappear at the next deploy — set them before auditions open, not after.
+- [x] **Block `/private/*` on `media.noagendatalentsearch.com`** with a Cloudflare rule. The app writes original uploads under a `private/` key prefix and never links to them, but an R2 custom domain serves the whole bucket — and unlike the streaming copy, the original still carries the uploader's ID3 tags. The keys are UUIDs so nothing is enumerable, but this is the belt to that braces.
+- [x] Set the five `R2_*` variables on **both** the web service and the `process-demos` cron. The app falls back to local disk if any one of them is missing, which on Render means uploads disappear at the next deploy — set them before auditions open, not after.
 
 ## A.5 Environment Variables
 
