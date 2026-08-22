@@ -1,6 +1,15 @@
+# NOT the source of truth for what is currently deployed. The live web service
+# and Postgres were created by hand in the Render dashboard, not from this
+# Blueprint, so nothing here has ever been applied: env var changes made in this
+# file do not reach production, and the cron jobs below do not exist yet -- they
+# have to be created in the dashboard too. Names here match the real service and
+# database so the two stop contradicting each other, but adopting the Blueprint
+# is an open decision (see spec Appendix A.3): it may create duplicates rather
+# than take over the running service, which would mean moving the custom domain
+# and reissuing its certificate.
 services:
   - type: web
-    name: noagendatalentsearch
+    name: noagenda-talentsearch
     runtime: docker
     dockerfilePath: ./Dockerfile
     healthCheckPath: /healthz
@@ -54,7 +63,7 @@ services:
           property: connectionString
       - key: SECRET_KEY
         fromService:
-          name: noagendatalentsearch
+          name: noagenda-talentsearch
           type: web
           envVarKey: SECRET_KEY
       - key: APP_ENV
@@ -80,7 +89,7 @@ services:
           property: connectionString
       - key: SECRET_KEY
         fromService:
-          name: noagendatalentsearch
+          name: noagenda-talentsearch
           type: web
           envVarKey: SECRET_KEY
       - key: APP_ENV

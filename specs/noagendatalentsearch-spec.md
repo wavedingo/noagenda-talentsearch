@@ -375,12 +375,30 @@ Ordered setup guide. Steps 1–4 are producer tasks (accounts, DNS, credentials)
 - [x] Create a Render account, connect it to GitHub.
 - [x] Create a **Web Service** from the repo (Claude Code will provide a Dockerfile — use Docker runtime so `ffmpeg` is available).
 - [x] Create a **Render Postgres** instance (starter tier is plenty). Copy the internal connection string.
-- [ ] Create three **Cron Jobs** (all declared in `render.yaml`, so a Blueprint deploy creates them):
-  - `rss-sync` — every 30 min (`*/30 * * * *`)
-  - `process-demos` — every 15 min (`*/15 * * * *`); the transcode backstop, not the normal path — uploads transcode immediately in a background thread, and this only picks up what a deploy or crash abandoned
-  - `recompute-scores` — hourly (`0 * * * *`) — lands with Phase 4
-- [ ] Add the custom domain `noagendatalentsearch.com` in Render; it will supply a CNAME/A target to add in Cloudflare DNS.
-- [ ] In Cloudflare, add that record with proxy **enabled** (orange cloud).
+**The web service and Postgres were created by hand, not from a Blueprint** (the
+live service is named `noagenda-talentsearch`). So `render.yaml` has never been
+applied and is documentation only: env var changes made there — `ALLOWED_HOSTS`,
+for one — must also be set on the service in the dashboard, and the cron jobs
+below have to be created by hand. Adopting the Blueprint later is an open
+decision; it may create duplicate services rather than take over the running
+one, which would mean moving the custom domain and reissuing its certificate.
+
+- [ ] Create two **Cron Jobs** by hand (Docker runtime, same repo). Each is a
+      separate container and inherits nothing from the web service, so both need
+      `DATABASE_URL` (the same Postgres), a matching `SECRET_KEY`, and
+      `APP_ENV=production`:
+  - `rss-sync` — every 30 min (`*/30 * * * *`), `python manage.py rss_sync`. Also
+    needs `RSS_FEED_URL`. Confirmed not yet running: the production episodes page
+    still reads "No episodes synced yet".
+  - `process-demos` — every 15 min (`*/15 * * * *`), `python manage.py process_demos`.
+    Also needs all five `R2_*` vars — miss one and it silently writes transcoded
+    audio to a cron container's disk, which is discarded when the job exits. The
+    transcode backstop, not the normal path: uploads transcode immediately in a
+    background thread, and this only picks up what a deploy or crash abandoned.
+  - `recompute-scores` — hourly (`0 * * * *`) — **do not create yet**; the command
+    lands with Phase 4 and would fail hourly until then.
+- [x] Add the custom domain `noagendatalentsearch.com` in Render; it will supply a CNAME/A target to add in Cloudflare DNS.
+- [x] In Cloudflare, add that record with proxy **enabled** (orange cloud).
 - [ ] Enable **auto-deploy on push to `main`**.
 
 ## A.4 Object Storage (Cloudflare R2)
