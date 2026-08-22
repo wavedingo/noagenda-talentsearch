@@ -1,0 +1,13 @@
+Here's your sign-in link for the No Agenda Talent Search.
+
+{{ link_url }}
+
+The link works once and expires in 15 minutes.
+
+If you didn't ask to sign in, you can ignore this message — the link is
+useless to anyone who doesn't have this email, and we won't send another
+unless someone requests one.
+
+--
+No Agenda Talent Search
+{{ app_url }}

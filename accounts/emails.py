@@ -1,12 +1,46 @@
+from email.utils import make_msgid, parseaddr
+
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+
+DEFAULT_MESSAGE_ID_DOMAIN = "noagendatalentsearch.com"
+
+
+def _message_id_domain():
+    """The domain to stamp into Message-ID, taken from the From address.
+
+    Django otherwise derives Message-ID from socket.getfqdn(), which is the
+    *host's* name — a Render container id in production, and a reverse-IPv6
+    `.ip6.arpa` string on at least one dev machine. A Message-ID whose domain
+    doesn't match the From domain is a well-known spam heuristic, and this
+    message is the login: a message scored into a junk folder is a user who
+    cannot get in.
+    """
+    _, address = parseaddr(settings.MAIL_FROM)
+    _, separator, domain = address.rpartition("@")
+    # rpartition returns the whole string as the tail when there is no "@",
+    # so a bare "postmaster" would otherwise become the Message-ID domain.
+    return domain if separator and domain else DEFAULT_MESSAGE_ID_DOMAIN
 
 
 def send_magic_link_email(to_email, raw_token):
     link_url = f"{settings.APP_URL}/auth/verify/{raw_token}/"
-    send_mail(
+    context = {"link_url": link_url, "app_url": settings.APP_URL}
+
+    message = EmailMultiAlternatives(
         subject="Your No Agenda Talent Search sign-in link",
-        message=f"Click to sign in (expires in 15 minutes): {link_url}",
+        body=render_to_string("accounts/email/magic_link.txt", context),
         from_email=settings.MAIL_FROM,
-        recipient_list=[to_email],
+        to=[to_email],
+        headers={
+            "Message-ID": make_msgid(domain=_message_id_domain()),
+            # Keeps out-of-office responders and ticket systems from replying
+            # to a login link.
+            "Auto-Submitted": "auto-generated",
+        },
     )
+    message.attach_alternative(
+        render_to_string("accounts/email/magic_link.html", context), "text/html"
+    )
+    message.send()

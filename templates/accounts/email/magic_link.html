@@ -1,0 +1,29 @@
+{% comment %}
+Deliberately plain: inline styles only, no images, no external assets, no
+tracking pixel. Remote content is a spam signal and this message *is* the
+login — it has to reach the inbox on hosts that block images by default.
+{% endcomment %}<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#1a1a1a;max-width:32rem;margin:0 auto;padding:24px">
+  <p style="margin:0 0 16px">Here's your sign-in link for the No Agenda Talent Search.</p>
+
+  <p style="margin:0 0 24px">
+    <a href="{{ link_url }}" style="display:inline-block;padding:12px 20px;background:#1a1a1a;color:#ffffff;text-decoration:none;border-radius:4px">Sign in</a>
+  </p>
+
+  <p style="margin:0 0 16px;color:#555">The link works once and expires in 15 minutes.</p>
+
+  <p style="margin:0 0 16px;color:#555">
+    If the button doesn't work, copy this into your browser:<br>
+    <a href="{{ link_url }}" style="color:#555;word-break:break-all">{{ link_url }}</a>
+  </p>
+
+  <p style="margin:0 0 24px;color:#555">
+    If you didn't ask to sign in, you can ignore this message — the link is
+    useless to anyone who doesn't have this email, and we won't send another
+    unless someone requests one.
+  </p>
+
+  <p style="margin:0;padding-top:16px;border-top:1px solid #e0e0e0;color:#777;font-size:14px">
+    No Agenda Talent Search<br>
+    <a href="{{ app_url }}" style="color:#777">{{ app_url }}</a>
+  </p>
+</div>
