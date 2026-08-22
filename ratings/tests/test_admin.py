@@ -25,6 +25,12 @@ class AppearanceTaggingAdminTests(RatingsTestCase):
         self.assertContains(response, "Rob Dew")
         self.assertContains(response, "Tag as appearance")
 
+    def test_appearances_changelist_points_at_untagged_feed_hosts(self):
+        response = self.client.get(reverse("admin:ratings_appearance_changelist"))
+        self.assertContains(response, "tagged on an episode")
+        self.assertContains(response, "Rob Dew")
+        self.assertContains(response, reverse("admin:episodes_tag_appearances", args=[self.episode.pk]))
+
     def test_tagging_from_the_feed_name(self):
         self.client.post(
             reverse("admin:episodes_appearance_tag", args=[self.episode.pk]),

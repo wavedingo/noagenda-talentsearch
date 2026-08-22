@@ -52,6 +52,22 @@ class ResyncActionTests(SyncTestCase):
         )
         self.assertNotContains(response, 'name="title_display"')
 
+    def test_episode_change_page_links_to_appearance_tagging(self):
+        """The tagging screen is easy to miss from the episode form — that's
+        the page a moderator opens after clicking 1896."""
+        episode = make_episode(1896, feed_guest_hosts=["Rob Dew"])
+        response = self.client.get(
+            reverse("admin:episodes_episode_change", args=[episode.pk])
+        )
+        self.assertContains(response, reverse("admin:episodes_tag_appearances", args=[episode.pk]))
+        self.assertContains(response, "Tag appearances")
+
+    def test_changelist_offers_tag_appearances_when_none_are_tagged(self):
+        episode = make_episode(1896, feed_guest_hosts=["Rob Dew"])
+        response = self.client.get(reverse("admin:episodes_episode_changelist"))
+        self.assertContains(response, reverse("admin:episodes_tag_appearances", args=[episode.pk]))
+        self.assertContains(response, "Tag appearances")
+
 
 class ResyncPermissionTests(TestCase):
     def test_producer_cannot_trigger_a_sync(self):

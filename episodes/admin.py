@@ -33,6 +33,7 @@ class EpisodeAdmin(admin.ModelAdmin):
     # overwritten on the next run.
     readonly_fields = [f.name for f in Episode._meta.fields]
     change_list_template = "admin/episodes/episode/change_list.html"
+    change_form_template = "admin/episodes/episode/change_form.html"
 
     def has_module_permission(self, request):
         return request.user.is_active and request.user.is_staff
@@ -48,7 +49,8 @@ class EpisodeAdmin(admin.ModelAdmin):
     def appearances_link(self, obj):
         url = reverse("admin:episodes_tag_appearances", args=[obj.pk])
         count = getattr(obj, "appearance_count", obj.appearances.count())
-        return format_html('<a href="{}">{} tagged</a>', url, count)
+        label = "Tag appearances" if count == 0 else f"{count} tagged — edit"
+        return format_html('<a href="{}">{}</a>', url, label)
 
     def get_queryset(self, request):
         return super().get_queryset(request).annotate(appearance_count=Count("appearances"))

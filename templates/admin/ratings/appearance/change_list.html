@@ -1,0 +1,20 @@
+{% extends "admin/change_list.html" %}
+{% block content %}
+<p class="help">
+  Appearances are tagged on an episode, not created from this list.
+  Open <a href="{% url 'admin:episodes_episode_changelist' %}">Episodes</a>,
+  click the episode, then <strong>Tag appearances</strong>.
+</p>
+{% if untagged_feed_hosts %}
+  <h2>Feed names not yet tagged</h2>
+  <ul>
+    {% for episode in untagged_feed_hosts %}
+      <li>
+        {{ episode.episode_number }} — {{ episode.feed_guest_hosts|join:", " }}
+        · <a href="{% url 'admin:episodes_tag_appearances' episode.pk %}">Tag appearances</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+{{ block.super }}
+{% endblock %}
