@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
@@ -16,6 +18,8 @@ from .ratelimit import (
 )
 from .tokens import consume_magic_link, create_magic_link
 from .utils import get_client_ip
+
+logger = logging.getLogger(__name__)
 
 
 def request_magic_link(request):
@@ -47,7 +51,17 @@ def _maybe_send_magic_link(email, ip):
             user.delete()
             return
     raw_token = create_magic_link(user, requested_ip=ip)
-    send_magic_link_email(user.email, raw_token)
+    try:
+        send_magic_link_email(user.email, raw_token)
+    except Exception:
+        # A refused recipient (a typo'd domain, a dead corporate host) or a
+        # provider hiccup must not reach the user as a 500. Two reasons: a
+        # crash page is useless to someone who simply mistyped their address,
+        # and a response that differs by address leaks which addresses are
+        # deliverable -- the enumeration channel spec B.3 closes by insisting
+        # every request looks identical. The failure belongs in the logs,
+        # where the operator can see it, not on the producer's screen.
+        logger.exception("magic link email failed to send")
 
 
 def verify_magic_link(request, token):
