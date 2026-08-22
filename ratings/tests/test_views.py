@@ -15,7 +15,7 @@ class LeaderboardViewTests(RatingsTestCase):
     def test_empty_state_explains_the_main_board(self):
         response = self.client.get(reverse("ratings:leaderboard"))
         self.assertContains(response, "Community favorites")
-        self.assertContains(response, "inform the show's decision")
+        self.assertContains(response, "don't make it")
         self.assertContains(response, "Rising demos")
 
     def test_rising_lists_a_live_candidate_without_appearances(self):

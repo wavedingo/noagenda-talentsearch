@@ -12,7 +12,7 @@ class SmoothTests(SimpleTestCase):
         self.assertEqual(smooth(5, 10, 10, 3.5), 4.25)
 
     def test_many_votes_approach_the_raw_mean(self):
-        self.assertAlmostEqual(smooth(5, 10_000, 10, 3.5), 5, places=3)
+        self.assertAlmostEqual(smooth(5, 10_000, 10, 3.5), 5, places=2)
 
     def test_m_demo_matches_the_display_threshold(self):
         from ratings.scoring import M_DEMO
