@@ -2,6 +2,7 @@
 
 **Design:** `docs/superpowers/specs/2026-08-22-phase4-ratings-design.md`
 **Landed:** 2026-08-22
+**Tests:** 323 passing
 
 ## What shipped
 
