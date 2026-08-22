@@ -2,4 +2,14 @@
 {% block content %}
 <h1>Check your email</h1>
 <p>If that address is valid, a sign-in link is on its way. It expires in 15 minutes.</p>
+
+<p><strong>If it isn't in your inbox, look in your spam or junk folder.</strong>
+This site is new, and some providers &mdash; Yahoo and Outlook especially &mdash;
+put mail from a new sender there until they've learned to trust it.</p>
+
+<p>If you do find it there, marking it <em>not spam</em> will help the next one
+arrive properly. Adding <strong>{{ sender_address }}</strong> to your contacts
+helps too.</p>
+
+<p>Still nothing after a few minutes? <a href="{% url 'accounts:request_link' %}">Request another link</a>.</p>
 {% endblock %}

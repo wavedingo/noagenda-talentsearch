@@ -13,15 +13,27 @@ def _message_id_domain():
     Django otherwise derives Message-ID from socket.getfqdn(), which is the
     *host's* name — a Render container id in production, and a reverse-IPv6
     `.ip6.arpa` string on at least one dev machine. A Message-ID whose domain
-    doesn't match the From domain is a well-known spam heuristic, and this
-    message is the login: a message scored into a junk folder is a user who
-    cannot get in.
+    doesn't match the From domain is a well-known spam heuristic.
+
+    Worth knowing before relying on this: Resend sends via Amazon SES, and SES
+    replaces Message-ID with its own `@email.amazonses.com` value before the
+    mail leaves. Raw headers from delivered mail confirm it. So on the current
+    provider this header never reaches anyone, and it did not change the junk
+    verdict at Yahoo or Outlook. It is kept because the Django default is
+    wrong on its own terms and would start leaking the hostname the moment the
+    provider changes — not because it is doing anything today.
     """
     _, address = parseaddr(settings.MAIL_FROM)
     _, separator, domain = address.rpartition("@")
     # rpartition returns the whole string as the tail when there is no "@",
     # so a bare "postmaster" would otherwise become the Message-ID domain.
     return domain if separator and domain else DEFAULT_MESSAGE_ID_DOMAIN
+
+
+def sender_address():
+    """The bare address, no display name -- what we ask people to allowlist."""
+    _, address = parseaddr(settings.MAIL_FROM)
+    return address
 
 
 def send_magic_link_email(to_email, raw_token):

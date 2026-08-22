@@ -6,7 +6,7 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from .emails import send_magic_link_email
+from .emails import send_magic_link_email, sender_address
 from .forms import AccountForm, EmailForm
 from .models import User
 from .ratelimit import (
@@ -24,7 +24,9 @@ def request_magic_link(request):
         email = form.cleaned_data["email"].strip().lower()
         ip = get_client_ip(request)
         _maybe_send_magic_link(email, ip)
-        return render(request, "accounts/link_sent.html")
+        return render(
+            request, "accounts/link_sent.html", {"sender_address": sender_address()}
+        )
     return render(request, "accounts/request_link.html", {"form": form})
 
 

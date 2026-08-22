@@ -15,9 +15,12 @@ class MagicLinkEmailTests(TestCase):
 
     def test_message_id_domain_matches_from_domain(self):
         """Django defaults Message-ID to socket.getfqdn() — the container or
-        dev-machine hostname, which never matches the From domain. Spam filters
-        score that mismatch, and for magic-link auth a junked mail is a locked-out
-        user, so this stays pinned.
+        dev-machine hostname, which never matches the From domain.
+
+        This asserts what Django hands to the backend, not what a recipient sees:
+        Amazon SES (under Resend) overwrites Message-ID with its own in transit,
+        so on the current provider this value never leaves the building. The
+        assertion guards the day that provider changes.
         """
         _, from_address = parseaddr(self.sent.from_email)
         from_domain = from_address.rpartition("@")[2]
