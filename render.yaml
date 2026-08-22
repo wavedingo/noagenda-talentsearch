@@ -16,8 +16,11 @@ services:
         value: production
       - key: APP_URL
         value: https://noagendatalentsearch.com
+      # www is redirected to the apex at Render's edge, so Django should never
+      # see it -- listed anyway so a bypassed redirect serves the site instead
+      # of a bare 400.
       - key: ALLOWED_HOSTS
-        value: noagendatalentsearch.com
+        value: noagendatalentsearch.com,www.noagendatalentsearch.com
       - key: MAIL_FROM
         value: "No Agenda Talent Search <hello@noagendatalentsearch.com>"
       - key: RESEND_API_KEY

@@ -178,5 +178,15 @@ SESSION_COOKIE_SAMESITE = "Lax"
 
 CSRF_COOKIE_SECURE = APP_ENV == "production"
 
+# Cloudflare and Render both terminate TLS and forward plain HTTP to gunicorn,
+# so without this Django believes every request is http://. It then computes the
+# expected CSRF origin as http://noagendatalentsearch.com, compares it with the
+# https:// Origin the browser actually sent, and rejects the request -- a 403 on
+# every POST, including the login form, on a site that otherwise looks healthy.
+# Only trusted in production: the header is only meaningful when a proxy we
+# control sets it, and a direct client could otherwise forge it.
+if APP_ENV == "production":
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 LOGIN_URL = "accounts:request_link"
 LOGIN_REDIRECT_URL = "core:home"
