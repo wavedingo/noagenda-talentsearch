@@ -7,3 +7,4 @@ requests==2.32.*
 defusedxml==0.7.*
 django-storages[s3]==1.14.*
 Pillow==11.*
+sentry-sdk==2.*

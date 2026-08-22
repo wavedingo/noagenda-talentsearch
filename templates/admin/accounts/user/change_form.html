@@ -1,0 +1,46 @@
+{% extends "admin/change_form.html" %}
+{% block after_field_sets %}
+  {% if original %}
+    <fieldset class="module aligned">
+      <h2>Actions</h2>
+      {% if can_moderate_user %}
+        <form method="post" action="{% url 'admin:accounts_user_action' original.pk %}" style="padding:0 0 1rem 0">
+          {% csrf_token %}
+          {% if original.banned_at %}
+            <button type="submit" name="action" value="unban">Unban this account</button>
+          {% else %}
+            <button type="submit" name="action" value="ban">Ban this account</button>
+          {% endif %}
+          <label>
+            Role
+            <select name="role">
+              {% for value, label in roles %}
+                <option value="{{ value }}"{% if original.role == value %} selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </label>
+          <button type="submit" name="action" value="set_role">Save role</button>
+        </form>
+      {% endif %}
+    </fieldset>
+    <fieldset class="module">
+      <h2>Rating history ({{ ratings|length }})</h2>
+      <table>
+        <thead>
+          <tr><th>When</th><th>What</th><th>Stars</th></tr>
+        </thead>
+        <tbody>
+          {% for rating in ratings %}
+            <tr>
+              <td>{{ rating.updated_at|date:"j M Y, H:i" }}</td>
+              <td>{{ rating.rateable_type }} #{{ rating.rateable_id }}</td>
+              <td>{{ rating.stars }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="3">No ratings.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </fieldset>
+  {% endif %}
+{% endblock %}

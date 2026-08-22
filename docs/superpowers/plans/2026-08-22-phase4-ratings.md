@@ -20,8 +20,8 @@
 ## Notes for Phase 5
 
 1. Create the **`recompute-scores` cron in the Render dashboard** (hourly, same env as the web service: `DATABASE_URL`, `SECRET_KEY`, `APP_ENV=production`).
-2. **Settings are now in Django admin** (`/django-admin/` → Core → Runtime settings). The `vote_eligibility_hours` blast-radius confirmation ("N accounts become eligible") is still not built — saving `0` shows a warning, then takes effect.
-3. Reports, Turnstile, the rest of §8's rate limits (including 30 ratings/min), and vote-velocity analytics are still outstanding.
+2. **Settings are now in Django admin** (`/django-admin/` → Core → Runtime settings). Phase 5 adds blast-radius confirmation for `vote_eligibility_hours`.
+3. Reports, Turnstile, the rest of §8's rate limits (including 30 ratings/min), and vote-velocity analytics belong to Phase 5.
 4. Moderator permissions are still the local `ModeratorVisibleAdmin` / `has_view_permission` overrides, not a general role map.
 
 ## Local development

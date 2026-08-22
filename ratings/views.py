@@ -6,6 +6,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from .forms import RatingForm
+from .ratelimit import rating_rate_limited
 from .services import (
     RatingError,
     community_favorites,
@@ -35,6 +36,9 @@ def rate(request):
     next_url = _safe_next(request)
     if not form.is_valid():
         messages.error(request, "That rating could not be saved.")
+        return redirect(next_url)
+    if rating_rate_limited(request.user):
+        messages.error(request, "That's too many ratings in a short span. Try again in a minute.")
         return redirect(next_url)
     data = form.cleaned_data
     try:

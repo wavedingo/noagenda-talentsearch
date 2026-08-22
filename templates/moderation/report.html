@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Report {{ candidate.stage_name }} — No Agenda Talent Search{% endblock %}
+{% block content %}
+<p class="note"><a href="{% url 'candidates:detail' candidate.slug %}">← Back to {{ candidate.stage_name }}</a></p>
+
+<h1>Report this profile</h1>
+<p class="page-intro">
+  A person reads every report. This is for impersonation, offensive material, or
+  spam — not for a rating you disagree with. We will not tell {{ candidate.stage_name }}
+  who filed this.
+</p>
+
+<form method="post" class="stacked-form">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Submit report</button>
+</form>
+{% endblock %}

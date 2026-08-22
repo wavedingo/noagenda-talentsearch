@@ -1,5 +1,7 @@
 from django.core import mail
-from django.test import TestCase
+from unittest.mock import patch
+
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from accounts.models import User
@@ -76,3 +78,22 @@ class RequestMagicLinkTests(TestCase):
         self.client.post(reverse("accounts:request_link"), {"email": "pwcheck@example.com"})
         user = User.objects.get(email="pwcheck@example.com")
         self.assertFalse(user.has_usable_password())
+
+    @override_settings(TURNSTILE_SITE_KEY="site", TURNSTILE_SECRET_KEY="secret")
+    def test_missing_turnstile_token_does_not_send_a_link(self):
+        response = self.client.post(reverse("accounts:request_link"), {"email": "bot@example.com"})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "accounts/request_link.html")
+        self.assertContains(response, "confirm you're a person")
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertFalse(User.objects.filter(email="bot@example.com").exists())
+
+    @override_settings(TURNSTILE_SITE_KEY="site", TURNSTILE_SECRET_KEY="secret")
+    @patch("accounts.views.verify_turnstile", return_value=True)
+    def test_valid_turnstile_token_sends_a_link(self, _verify):
+        response = self.client.post(
+            reverse("accounts:request_link"),
+            {"email": "human@example.com", "cf-turnstile-response": "ok"},
+        )
+        self.assertTemplateUsed(response, "accounts/link_sent.html")
+        self.assertEqual(len(mail.outbox), 1)

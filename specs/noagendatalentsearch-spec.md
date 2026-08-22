@@ -311,7 +311,7 @@ Chosen for one-producer maintainability, not resume-driven engineering.
 
 **Phase 4 — Ratings:** Demo ratings, appearance tagging (admin), appearance ratings, Bayesian scoring job, leaderboard + Rising Demos.
 
-**Phase 5 — Hardening:** Reports, rate limits, Turnstile, vote-velocity analytics, audit log, admin digest email, backups, deploy.
+**Phase 5 — Hardening:** Reports, rate limits, Turnstile, vote-velocity analytics, audit log, admin digest email, backups, deploy. **Landed 2026-08-22.** Create the `admin-digest` and `weekly-backup` Render crons by hand (`render.yaml` is still not the live source of truth). Turnstile stays off until both keys are set on the web service.
 
 Each phase should end deployable. Ask Claude Code to write tests for: the scoring function, vote uniqueness, upload validation, and RSS idempotency — the four places silent bugs would hurt most.
 

@@ -2,5 +2,6 @@
 {% block object-tools-items %}
   <li><a href="{% url 'admin:candidates_moderation_queue' %}" class="button">Moderation queue</a></li>
   <li><a href="{% url 'admin:candidates_rankings' %}" class="button">Full rankings</a></li>
+  <li><a href="{% url 'admin:candidates_analytics' %}" class="button">Vote analytics</a></li>
   {{ block.super }}
 {% endblock %}

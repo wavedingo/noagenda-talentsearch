@@ -15,6 +15,8 @@ class Report(models.Model):
         RESOLVED = "resolved", "Resolved"
         DISMISSED = "dismissed", "Dismissed"
 
+    TARGET_CANDIDATE = "candidate"
+
     reporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reports_filed")
     target_type = models.CharField(max_length=20)
     target_id = models.PositiveIntegerField()
@@ -22,6 +24,18 @@ class Report(models.Model):
     details = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.OPEN)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["reporter", "target_type", "target_id"],
+                name="unique_report_per_user_target",
+            )
+        ]
+        indexes = [
+            models.Index(fields=["target_type", "target_id", "status"], name="report_target_status_idx"),
+        ]
 
 
 class AdminAuditLog(models.Model):

@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<p>
+  <strong>{{ blast.waiting_before }}</strong> accounts are currently within the waiting period.
+  Changing {{ old }} → {{ new }}
+  {% if blast.newly_eligible %}
+    will immediately make <strong>{{ blast.newly_eligible }}</strong> of them eligible to vote.
+  {% elif blast.newly_gated %}
+    will immediately re-gate <strong>{{ blast.newly_gated }}</strong> accounts that had not yet voted.
+  {% else %}
+    does not change who is currently eligible.
+  {% endif %}
+  Ratings already cast are not deleted.
+</p>
+{% if new == 0 %}
+  <p><strong>0 turns the gate off.</strong> New accounts can rate immediately.</p>
+{% endif %}
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="hours" value="{{ new }}">
+  <input type="hidden" name="value_json" value="{{ new }}">
+  <input type="hidden" name="confirm" value="1">
+  {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+  <button type="submit">Confirm change</button>
+  <a href="{{ cancel_url }}" class="button">Cancel</a>
+</form>
+{% endblock %}

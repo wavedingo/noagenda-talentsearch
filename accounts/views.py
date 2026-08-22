@@ -8,6 +8,8 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from core.turnstile import turnstile_enabled, verify_turnstile
+
 from .emails import send_magic_link_email, sender_address
 from .forms import AccountForm, EmailForm
 from .models import User
@@ -16,6 +18,7 @@ from .ratelimit import (
     ip_link_requests_exceeded,
     ip_signup_limit_exceeded,
 )
+from .services import delete_account
 from .tokens import consume_magic_link, create_magic_link
 from .utils import get_client_ip
 
@@ -25,13 +28,27 @@ logger = logging.getLogger(__name__)
 def request_magic_link(request):
     form = EmailForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
-        email = form.cleaned_data["email"].strip().lower()
         ip = get_client_ip(request)
+        if not verify_turnstile(request.POST.get("cf-turnstile-response"), ip):
+            return render(
+                request,
+                "accounts/request_link.html",
+                {
+                    "form": form,
+                    "turnstile_enabled": turnstile_enabled(),
+                    "turnstile_error": True,
+                },
+            )
+        email = form.cleaned_data["email"].strip().lower()
         _maybe_send_magic_link(email, ip)
         return render(
             request, "accounts/link_sent.html", {"sender_address": sender_address()}
         )
-    return render(request, "accounts/request_link.html", {"form": form})
+    return render(
+        request,
+        "accounts/request_link.html",
+        {"form": form, "turnstile_enabled": turnstile_enabled()},
+    )
 
 
 def _maybe_send_magic_link(email, ip):
@@ -66,7 +83,7 @@ def _maybe_send_magic_link(email, ip):
 
 def verify_magic_link(request, token):
     user = consume_magic_link(token)
-    if user is None:
+    if user is None or not user.is_active:
         return redirect("accounts:link_expired")
     if user.email_verified_at is None:
         user.email_verified_at = timezone.now()
@@ -77,7 +94,13 @@ def verify_magic_link(request, token):
 
 
 def link_expired(request):
-    return request_magic_link(request) if request.method == "POST" else render(request, "accounts/link_expired.html")
+    if request.method == "POST":
+        return request_magic_link(request)
+    return render(
+        request,
+        "accounts/link_expired.html",
+        {"turnstile_enabled": turnstile_enabled()},
+    )
 
 
 @require_POST
@@ -101,11 +124,6 @@ def account_view(request):
 @login_required
 @require_POST
 def delete_account_view(request):
-    user = request.user
-    user.email = f"deleted-{user.id}@deleted.noagendatalentsearch.com"
-    user.display_name = ""
-    user.signup_ip = None
-    user.deleted_at = timezone.now()
-    user.save(update_fields=["email", "display_name", "signup_ip", "deleted_at"])
+    delete_account(request.user)
     logout(request)
     return redirect("core:home")

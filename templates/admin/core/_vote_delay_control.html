@@ -1,0 +1,11 @@
+<form method="post" action="{% url 'admin:core_vote_delay' %}" style="margin:1rem 0;padding:0.75rem 1rem;border:1px solid #ddd;border-radius:6px;max-width:36rem">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.path }}">
+  <p style="margin:0 0 .5rem">
+    New accounts wait <strong>{{ vote_eligibility_hours }}</strong> hours before they can rate
+    ({{ waiting_now }} currently waiting). 0 turns the gate off.
+  </p>
+  <label for="id_vote_delay">Vote delay (hours)</label>
+  <input id="id_vote_delay" type="number" name="hours" min="0" max="336" value="{{ vote_eligibility_hours }}" required>
+  <button type="submit">Change delay</button>
+</form>

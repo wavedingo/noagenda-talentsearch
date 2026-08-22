@@ -106,6 +106,60 @@ services:
         value: https://media.noagendatalentsearch.com
 
   - type: cron
+    name: admin-digest
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    schedule: "0 13 * * *"
+    dockerCommand: python manage.py send_admin_digest
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: noagendatalentsearch-db
+          property: connectionString
+      - key: SECRET_KEY
+        fromService:
+          name: noagenda-talentsearch
+          type: web
+          envVarKey: SECRET_KEY
+      - key: APP_ENV
+        value: production
+      - key: MAIL_FROM
+        value: "No Agenda Talent Search <hello@noagendatalentsearch.com>"
+      - key: ADMIN_NOTIFY_EMAIL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+
+  - type: cron
+    name: weekly-backup
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    schedule: "0 6 * * 0"
+    dockerCommand: python manage.py backup_database
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: noagendatalentsearch-db
+          property: connectionString
+      - key: SECRET_KEY
+        fromService:
+          name: noagenda-talentsearch
+          type: web
+          envVarKey: SECRET_KEY
+      - key: APP_ENV
+        value: production
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET
+        value: nats-media
+      - key: R2_PUBLIC_BASE_URL
+        value: https://media.noagendatalentsearch.com
+
+  - type: cron
     name: recompute-scores
     runtime: docker
     dockerfilePath: ./Dockerfile

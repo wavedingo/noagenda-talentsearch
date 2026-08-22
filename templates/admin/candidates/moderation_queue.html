@@ -16,6 +16,8 @@
 {# admin/base_site.html already renders `title` as the heading. #}
 <p>Nothing here is public. Approving is what publishes it.</p>
 
+{% include "admin/core/_vote_delay_control.html" %}
+
 {% comment %}
   One form per item rather than one per section: a moderator working through a
   queue is making individual judgements, and a bulk checkbox invites approving

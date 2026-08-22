@@ -6,7 +6,12 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
+from accounts.utils import get_client_ip
+
 from core.settings_util import get_setting
+from core.turnstile import turnstile_enabled, verify_turnstile
+from moderation.forms import ReportForm
+from moderation.services import ReportError, file_report
 from ratings.models import Rating
 from ratings.services import load_user_stars
 from ratings.widgets import build_widget
@@ -33,7 +38,7 @@ def candidate_list(request):
     sort = request.GET.get("sort", DEFAULT_SORT)
     if sort not in SORTS:
         sort = DEFAULT_SORT
-    candidates = Candidate.objects.filter(status=Candidate.Status.LIVE).order_by(*SORTS[sort])
+    candidates = Candidate.objects.public().order_by(*SORTS[sort])
     page = Paginator(candidates, CANDIDATES_PER_PAGE).get_page(request.GET.get("page"))
     return render(
         request,
@@ -128,6 +133,7 @@ def audition(request):
             "auditions_open": auditions_open,
             "max_file_mb": get_setting("demo_max_file_mb"),
             "max_duration_min": int(get_setting("demo_max_duration_sec")) // 60,
+            "turnstile_enabled": turnstile_enabled(),
         },
     )
 
@@ -141,6 +147,9 @@ def upload_demo(request):
         return redirect("candidates:audition")
     if candidate.status == Candidate.Status.BANNED:
         raise Http404("No such candidate")
+    if not verify_turnstile(request.POST.get("cf-turnstile-response"), get_client_ip(request)):
+        messages.error(request, "Please confirm you're a person and try the upload again.")
+        return redirect("candidates:audition")
 
     form = DemoForm(request.POST, request.FILES)
     if not form.is_valid():
@@ -195,6 +204,41 @@ def _own_candidate(request):
     if candidate is None:
         raise Http404("No audition profile")
     return candidate
+
+
+@login_required
+def report_candidate(request, slug):
+    candidate = get_object_or_404(Candidate, slug=slug)
+    is_owner = candidate.user_id == request.user.pk
+    if not candidate.is_public and not (is_owner or _is_moderator(request.user)):
+        raise Http404("No such candidate")
+    if is_owner:
+        messages.error(request, "You can't report your own profile.")
+        return redirect("candidates:detail", slug=candidate.slug)
+
+    form = ReportForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            file_report(
+                request.user,
+                candidate,
+                form.cleaned_data["reason"],
+                form.cleaned_data.get("details", ""),
+            )
+        except ReportError as exc:
+            messages.error(request, exc.messages[0] if exc.messages else str(exc))
+        else:
+            messages.success(
+                request,
+                "Thanks. A person will look at this. We don't publish reports "
+                "or tell the candidate who filed them.",
+            )
+            return redirect("candidates:detail", slug=candidate.slug)
+    return render(
+        request,
+        "moderation/report.html",
+        {"form": form, "candidate": candidate},
+    )
 
 
 def _is_moderator(user):

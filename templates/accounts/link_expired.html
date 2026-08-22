@@ -2,9 +2,10 @@
 {% block content %}
 <h1>That link has expired</h1>
 <p>Sign-in links only work once and expire after 15 minutes. Enter your email and we'll send a fresh one.</p>
-<form method="post">
+<form method="post" class="stacked-form">
   {% csrf_token %}
   <input type="email" name="email" placeholder="you@example.com" required>
+  {% include "core/_turnstile.html" with turnstile_site_key=turnstile_site_key %}
   <button type="submit">Send me a new link</button>
 </form>
 {% endblock %}

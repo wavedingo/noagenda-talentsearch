@@ -1,0 +1,55 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<p>Open reports first. Ten unique open reports on one profile hide it from the public site automatically.</p>
+
+<div class="mq-section">
+  <h2>Open ({{ open_reports|length }})</h2>
+  {% for report in open_reports %}
+    <div class="mq-item" style="border:1px solid #ddd;border-radius:6px;padding:1rem;margin-bottom:1rem">
+      <p class="mq-head">
+        {% if report.candidate %}
+          <a href="{% url 'candidates:detail' report.candidate.slug %}">{{ report.candidate.stage_name }}</a>
+          {% if report.candidate.hidden_at %}<strong> — hidden</strong>{% endif %}
+        {% else %}
+          candidate #{{ report.target_id }}
+        {% endif %}
+      </p>
+      <p class="mq-meta">
+        {{ report.get_reason_display }} · filed {{ report.created_at|date:"j M Y, H:i" }}
+        by {{ report.reporter.email }}
+        · {{ report.open_count }} open on this profile
+      </p>
+      {% if report.details %}<p>{{ report.details }}</p>{% endif %}
+      <form method="post" action="{% url 'admin:moderation_report_decide' %}" style="display:flex;flex-wrap:wrap;gap:.5rem">
+        {% csrf_token %}
+        <input type="hidden" name="report_id" value="{{ report.pk }}">
+        <button type="submit" name="outcome" value="resolved">Resolved</button>
+        <button type="submit" name="outcome" value="dismissed">Dismiss</button>
+      </form>
+    </div>
+  {% empty %}
+    <p><em>Nothing waiting.</em></p>
+  {% endfor %}
+</div>
+
+<div class="mq-section">
+  <h2>Recently closed</h2>
+  <table class="listing">
+    <thead>
+      <tr><th>When</th><th>Profile</th><th>Reason</th><th>Outcome</th></tr>
+    </thead>
+    <tbody>
+      {% for report in closed_reports %}
+        <tr>
+          <td>{{ report.created_at|date:"j M Y" }}</td>
+          <td>{% if report.candidate %}{{ report.candidate.stage_name }}{% else %}#{{ report.target_id }}{% endif %}</td>
+          <td>{{ report.get_reason_display }}</td>
+          <td>{{ report.get_status_display }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4">None yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

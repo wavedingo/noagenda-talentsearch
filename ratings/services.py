@@ -279,7 +279,7 @@ def leaderboard_size():
 def community_favorites():
     size = leaderboard_size()
     return list(
-        Candidate.objects.filter(status=Candidate.Status.LIVE, composite_score__isnull=False)
+        Candidate.objects.public().filter(composite_score__isnull=False)
         .order_by("-composite_score", "-approved_at")[:size]
     )
 
@@ -287,6 +287,6 @@ def community_favorites():
 def rising_demos():
     size = leaderboard_size()
     return list(
-        Candidate.objects.filter(status=Candidate.Status.LIVE, composite_score__isnull=True)
+        Candidate.objects.public().filter(composite_score__isnull=True)
         .order_by("-demo_score", "-approved_at")[:size]
     )

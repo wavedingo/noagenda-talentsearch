@@ -4,6 +4,13 @@ from django.db import models
 from accounts.models import User
 
 
+class CandidateQuerySet(models.QuerySet):
+    def public(self):
+        """Live and not auto-hidden (spec 3.7). Status stays live so a
+        moderator can unhide without re-approving the profile."""
+        return self.filter(status=Candidate.Status.LIVE, hidden_at__isnull=True)
+
+
 class RejectionReason(models.TextChoices):
     """Canned reasons (spec 3.2). The message a candidate actually receives is
     in `REJECTION_MESSAGES` -- these labels are the moderator-facing shorthand."""
@@ -96,6 +103,7 @@ class Candidate(RejectableMixin):
     pending_submitted_at = models.DateTimeField(null=True, blank=True)
 
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    hidden_at = models.DateTimeField(null=True, blank=True)
     is_featured = models.BooleanField(default=False)
     rejection_reason = models.CharField(max_length=30, choices=RejectionReason.choices, blank=True)
     rejection_note = models.TextField(blank=True)
@@ -108,6 +116,8 @@ class Candidate(RejectableMixin):
     appearance_score = models.FloatField(null=True, blank=True)
     composite_score = models.FloatField(null=True, blank=True)
 
+    objects = CandidateQuerySet.as_manager()
+
     class Meta:
         ordering = ["-created_at"]
 
@@ -116,7 +126,7 @@ class Candidate(RejectableMixin):
 
     @property
     def is_public(self):
-        return self.status == self.Status.LIVE
+        return self.status == self.Status.LIVE and self.hidden_at is None
 
     @property
     def has_pending_edit(self):

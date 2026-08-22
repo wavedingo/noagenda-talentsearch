@@ -61,4 +61,14 @@
   Guest-host appearances and their ratings appear here once this candidate has been on the show.
 </p>
 {% endif %}
+
+{% if user.is_authenticated and not is_owner %}
+  <p class="note report-link">
+    <a href="{% url 'candidates:report' candidate.slug %}">Report this profile</a>
+  </p>
+{% elif not user.is_authenticated %}
+  <p class="note report-link">
+    <a href="{% url 'accounts:request_link' %}">Log in to report this profile</a>
+  </p>
+{% endif %}
 {% endblock %}

@@ -1,0 +1,51 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<p class="help">
+  Ratings in the last 6 hours, 24 hours, and 7 days on each live candidate's
+  demo and appearances. A spike is 20 or more ratings in 24 hours and at least
+  three times that candidate's 7-day daily average.
+</p>
+
+{% include "admin/core/_vote_delay_control.html" %}
+
+<h2>Vote velocity</h2>
+<table class="listing">
+  <thead>
+    <tr>
+      <th>Candidate</th>
+      <th>6h</th>
+      <th>24h</th>
+      <th>7d</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in velocity %}
+      <tr{% if row.spiked %} style="background:#fff3cd"{% endif %}>
+        <td><a href="{% url 'admin:candidates_candidate_change' row.candidate.pk %}">{{ row.candidate.stage_name }}</a></td>
+        <td>{{ row.last_6h }}</td>
+        <td>{{ row.last_24h }}</td>
+        <td>{{ row.last_7d }}</td>
+        <td>{% if row.spiked %}Possible spike{% endif %}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5">No ratings in the last week.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Votes per account</h2>
+<p class="help">How many accounts have cast this many ratings. A pile of 1-rating accounts after an episode is normal; a pile of 40-rating accounts is not.</p>
+<table class="listing">
+  <thead>
+    <tr><th>Ratings</th><th>Accounts</th></tr>
+  </thead>
+  <tbody>
+    {% for n, accounts in histogram %}
+      <tr><td>{{ n }}</td><td>{{ accounts }}</td></tr>
+    {% empty %}
+      <tr><td colspan="2">No ratings yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

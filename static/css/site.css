@@ -292,6 +292,7 @@ audio {
 
 .stacked-form input[type="text"],
 .stacked-form input[type="email"],
+.stacked-form select,
 .stacked-form textarea {
   width: 100%;
   padding: 0.55rem 0.65rem;

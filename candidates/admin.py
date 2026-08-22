@@ -7,6 +7,10 @@ from django.utils.decorators import method_decorator
 from django.utils.html import format_html
 from django.views.decorators.http import require_POST
 
+from core.settings_util import get_setting
+from ratings.analytics import candidate_velocity, votes_per_account_histogram
+from ratings.eligibility import waiting_queryset
+
 from . import services, tasks
 from .forms import ModerationDecisionForm
 from .models import Candidate, Demo, RejectionReason
@@ -39,7 +43,7 @@ class ModeratorVisibleAdmin(admin.ModelAdmin):
 
 @admin.register(Candidate)
 class CandidateAdmin(ModeratorVisibleAdmin):
-    list_display = ("stage_name", "user", "status", "has_pending_edit", "is_featured", "created_at")
+    list_display = ("stage_name", "user", "status", "is_hidden", "has_pending_edit", "is_featured", "created_at")
     list_filter = ("status", "is_featured")
     search_fields = ("stage_name", "slug", "user__email")
     readonly_fields = ("created_at", "updated_at", "approved_at", "pending_submitted_at")
@@ -48,6 +52,10 @@ class CandidateAdmin(ModeratorVisibleAdmin):
     @admin.display(boolean=True, description="Edit pending")
     def has_pending_edit(self, obj):
         return obj.has_pending_edit
+
+    @admin.display(boolean=True, description="Hidden")
+    def is_hidden(self, obj):
+        return obj.hidden_at is not None
 
     def get_urls(self):
         return [
@@ -70,6 +78,11 @@ class CandidateAdmin(ModeratorVisibleAdmin):
                 "rankings/",
                 self.admin_site.admin_view(self.rankings_view),
                 name="candidates_rankings",
+            ),
+            path(
+                "analytics/",
+                self.admin_site.admin_view(self.analytics_view),
+                name="candidates_analytics",
             ),
         ] + super().get_urls()
 
@@ -113,6 +126,8 @@ class CandidateAdmin(ModeratorVisibleAdmin):
             "failed_demos": failed_demos,
             "rejection_reasons": RejectionReason.choices,
             "opts": self.model._meta,
+            "vote_eligibility_hours": get_setting("vote_eligibility_hours"),
+            "waiting_now": waiting_queryset(get_setting("vote_eligibility_hours")).count(),
         }
         return render(request, "admin/candidates/moderation_queue.html", context)
 
@@ -180,6 +195,19 @@ class CandidateAdmin(ModeratorVisibleAdmin):
             "opts": self.model._meta,
         }
         return render(request, "admin/candidates/rankings.html", context)
+
+    def analytics_view(self, request):
+        hours = get_setting("vote_eligibility_hours")
+        context = {
+            **self.admin_site.each_context(request),
+            "title": "Vote analytics",
+            "velocity": candidate_velocity(),
+            "histogram": votes_per_account_histogram(),
+            "vote_eligibility_hours": hours,
+            "waiting_now": waiting_queryset(hours).count(),
+            "opts": self.model._meta,
+        }
+        return render(request, "admin/candidates/analytics.html", context)
 
 
 @admin.register(Demo)

@@ -39,3 +39,14 @@ class VerifyMagicLinkTests(TestCase):
         response = self.client.get(reverse("accounts:link_expired"))
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "producer@example.com")
+
+    def test_banned_account_cannot_use_a_valid_link(self):
+        from django.utils import timezone
+
+        self.user.banned_at = timezone.now()
+        self.user.save(update_fields=["banned_at"])
+        raw_token = create_magic_link(self.user)
+        response = self.client.get(reverse("accounts:verify", args=[raw_token]))
+        self.assertRedirects(response, reverse("accounts:link_expired"))
+        home = self.client.get(reverse("core:home"))
+        self.assertNotContains(home, "producer@example.com")

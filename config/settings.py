@@ -67,6 +67,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core.context_processors.turnstile",
             ],
         },
     },
@@ -155,6 +156,21 @@ CACHES = {
 }
 
 MAIL_FROM = os.environ.get("MAIL_FROM", "No Agenda Talent Search <hello@noagendatalentsearch.com>")
+ADMIN_NOTIFY_EMAIL = os.environ.get("ADMIN_NOTIFY_EMAIL", "") or MAIL_FROM
+
+TURNSTILE_SITE_KEY = os.environ.get("TURNSTILE_SITE_KEY", "")
+TURNSTILE_SECRET_KEY = os.environ.get("TURNSTILE_SECRET_KEY", "")
+
+SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        send_default_pii=False,
+    )
 
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 if RESEND_API_KEY:
@@ -187,6 +203,12 @@ CSRF_COOKIE_SECURE = APP_ENV == "production"
 # control sets it, and a direct client could otherwise forge it.
 if APP_ENV == "production":
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    # HSTS is only attached to HTTPS responses, so Render's plain-HTTP
+    # health check is unaffected. Do not set SECURE_SSL_REDIRECT: Cloudflare
+    # already forces HTTPS, and a Django 301 would fail that same health check.
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = False
 
 LOGIN_URL = "accounts:request_link"
 LOGIN_REDIRECT_URL = "core:home"
