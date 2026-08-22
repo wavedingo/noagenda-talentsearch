@@ -398,7 +398,7 @@ one, which would mean moving the custom domain and reissuing its certificate.
     lands with Phase 4 and would fail hourly until then.
 - [x] Add the custom domain `noagendatalentsearch.com` in Render; it will supply a CNAME/A target to add in Cloudflare DNS.
 - [x] In Cloudflare, add that record with proxy **enabled** (orange cloud).
-- [ ] Enable **auto-deploy on push to `main`**.
+- [x] Enable **auto-deploy on push to `main`**.
 
 ## A.4 Object Storage (Cloudflare R2)
 
