@@ -36,9 +36,11 @@ before starting the next one.
   in production (Render), SQLite locally.
 - Apps: `accounts`, `core`, `candidates`, `episodes`, `ratings`, `moderation`.
 - **Admin is at `/django-admin/`**, not `/admin/`.
-- **Runtime settings live in the `core.Settings` table**, read via `get_setting(key)`.
-  Environment variables seed them on first boot only — never read config from the
-  environment at request time (spec §4.1).
+- **Runtime settings live in the `core.Settings` table**, read via `get_setting(key)`
+  and written via `set_setting(key, value)`. Edit them at `/django-admin/` → Core →
+  Runtime settings. Environment variables seed them on first boot only — never read
+  config from the environment at request time (spec §4.1). `set_setting` clears this
+  process's 60s cache; other workers catch up within a minute.
 - Dependencies are added sparingly and pinned to a minor series in `requirements.txt`.
 - One small hand-written stylesheet (`static/css/site.css`), mobile-first. Most of this
   audience is on a phone.

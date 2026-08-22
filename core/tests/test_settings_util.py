@@ -2,7 +2,7 @@ from django.core.cache import cache
 from django.test import TestCase
 
 from core.models import Settings
-from core.settings_util import get_setting
+from core.settings_util import get_setting, set_setting
 
 
 class GetSettingTests(TestCase):
@@ -28,3 +28,9 @@ class GetSettingTests(TestCase):
     def test_falsy_values_are_cached_correctly(self):
         Settings.objects.create(key="score_weight_demo", value_json=0)
         self.assertEqual(get_setting("score_weight_demo"), 0)
+
+    def test_set_setting_updates_the_value_and_the_cache(self):
+        Settings.objects.create(key="vote_eligibility_hours", value_json=48)
+        self.assertEqual(get_setting("vote_eligibility_hours"), 48)
+        set_setting("vote_eligibility_hours", 0)
+        self.assertEqual(get_setting("vote_eligibility_hours"), 0)

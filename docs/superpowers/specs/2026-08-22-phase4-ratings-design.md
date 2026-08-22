@@ -31,7 +31,7 @@
 
 12. **Unlinked appearances are rateable but do not enter the leaderboard** until a candidate is linked. Their ratings still move `C_appearances` (the site-wide prior). A guest host who never auditioned here can be rated the night they appear; claiming a profile later carries those ratings onto that candidate's appearance score automatically.
 
-13. **Settings UI and vote-velocity analytics stay in Phase 5.** Weights, windows, and eligibility already live in `core.Settings` and are read via `get_setting()`. Changing them this phase is the shell / Django's `Settings` table. The blast-radius confirmation for `vote_eligibility_hours`, compact controls on the queue, and brigading graphs belong with the rest of the admin panel work.
+13. **Settings are editable in Django admin; blast-radius confirmation stays in Phase 5.** Weights, windows, and eligibility live in `core.Settings` and are read via `get_setting()`. Moderators can change operational keys (including `vote_eligibility_hours` and `appearance_rating_window_days`) at `/django-admin/` → Core → Runtime settings; score weights and `min_episode_number` stay admin-only. The blast-radius confirmation for `vote_eligibility_hours`, compact controls on the queue, and brigading graphs belong with the rest of the admin panel work.
 
 ## Scoring (exact)
 

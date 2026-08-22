@@ -32,3 +32,10 @@ class AboutTests(TestCase):
         response = self.client.get("/about/")
         self.assertContains(response, "12 hours after signup")
         self.assertNotContains(response, "48 hours after signup")
+
+    def test_about_says_accounts_can_rate_immediately_when_delay_is_off(self):
+        cache.clear()
+        Settings.objects.filter(key="vote_eligibility_hours").update(value_json=0)
+        response = self.client.get("/about/")
+        self.assertContains(response, "as soon as they sign in")
+        self.assertNotContains(response, "0 hours after signup")

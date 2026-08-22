@@ -54,7 +54,11 @@
 
 <ul>
   <li>Accounts are free and require only an email address.</li>
+  {% if vote_eligibility_hours %}
   <li>New accounts can rate demos and appearances starting {{ vote_eligibility_hours }} hours after signup.</li>
+  {% else %}
+  <li>New accounts can rate demos and appearances as soon as they sign in.</li>
+  {% endif %}
   <li>One account per human. Ballot-stuffing gets accounts removed and does your favorite candidate no favors.</li>
   <li>All submissions — demos, bios, photos — are reviewed by a human before they appear on the site.</li>
   <li>Questions, problems, takedown requests: <a href="mailto:hello@noagendatalentsearch.com">hello@noagendatalentsearch.com</a></li>

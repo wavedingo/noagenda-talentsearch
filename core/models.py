@@ -5,5 +5,9 @@ class Settings(models.Model):
     key = models.CharField(max_length=100, primary_key=True)
     value_json = models.JSONField()
 
+    class Meta:
+        verbose_name = "runtime setting"
+        verbose_name_plural = "runtime settings"
+
     def __str__(self):
         return self.key

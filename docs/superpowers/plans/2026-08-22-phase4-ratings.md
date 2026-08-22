@@ -20,7 +20,7 @@
 ## Notes for Phase 5
 
 1. Create the **`recompute-scores` cron in the Render dashboard** (hourly, same env as the web service: `DATABASE_URL`, `SECRET_KEY`, `APP_ENV=production`).
-2. **Settings UI** with the `vote_eligibility_hours` blast-radius confirmation still is not built — change settings via the `core.Settings` table / shell.
+2. **Settings are now in Django admin** (`/django-admin/` → Core → Runtime settings). The `vote_eligibility_hours` blast-radius confirmation ("N accounts become eligible") is still not built — saving `0` shows a warning, then takes effect.
 3. Reports, Turnstile, the rest of §8's rate limits (including 30 ratings/min), and vote-velocity analytics are still outstanding.
 4. Moderator permissions are still the local `ModeratorVisibleAdmin` / `has_view_permission` overrides, not a general role map.
 
@@ -32,4 +32,4 @@ Same as Phase 3. After migrate:
 python manage.py recompute_scores
 ```
 
-Vote eligibility defaults to 48 hours. For local rating tests, either wait, set `vote_eligible_override_at` on the user, or `Settings.objects.filter(key="vote_eligibility_hours").update(value_json=0)` and restart / wait 60s for the cache (or `cache.clear()`).
+Vote eligibility defaults to 48 hours. For local rating tests, either wait, set `vote_eligible_override_at` on the user, or set `vote_eligibility_hours` to `0` in Django admin (`set_setting` clears this process's cache; other workers catch up within 60s).
