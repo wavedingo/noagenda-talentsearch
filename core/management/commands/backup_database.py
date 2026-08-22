@@ -32,16 +32,24 @@ def _pg_dump():
     database_url = os.environ.get("DATABASE_URL", "")
     if not database_url:
         raise CommandError("DATABASE_URL is not set")
+    pg_dump = os.environ.get("PG_DUMP_BIN", "pg_dump")
     try:
         result = subprocess.run(
-            ["pg_dump", "--no-owner", "--no-acl", "--dbname", database_url],
+            [pg_dump, "--no-owner", "--no-acl", "--dbname", database_url],
             check=True,
             capture_output=True,
         )
     except FileNotFoundError as exc:
-        raise CommandError("pg_dump is not installed in this image") from exc
+        raise CommandError(f"{pg_dump} is not installed in this image") from exc
     except subprocess.CalledProcessError as exc:
-        raise CommandError(exc.stderr.decode("utf-8", errors="replace")) from exc
+        stderr = exc.stderr.decode("utf-8", errors="replace")
+        if "server version mismatch" in stderr:
+            raise CommandError(
+                stderr
+                + "The image needs a pg_dump at least as new as the Render "
+                "Postgres major version. See PG_DUMP_BIN in the Dockerfile."
+            ) from exc
+        raise CommandError(stderr) from exc
     return result.stdout
 
 

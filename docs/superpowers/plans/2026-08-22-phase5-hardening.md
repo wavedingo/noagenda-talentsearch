@@ -15,7 +15,7 @@
 - **Blast-radius confirmation** for `vote_eligibility_hours`.
 - **Audit log** is admin-only. New actions: `user.ban` / `user.unban` / `user.role_change` / `report.*` / `candidate.auto_hide` / `candidate.unhide`.
 - **`send_admin_digest`** and **`backup_database`** management commands, declared in `render.yaml` (`admin-digest` daily 13:00 UTC, `weekly-backup` Sundays 06:00 UTC). Create both in the Render dashboard — the Blueprint is still not live.
-- **HSTS** in production. No Django SSL-redirect (Render health checks). Sentry initialises only when `SENTRY_DSN` is set. `postgresql-client` is in the image for `pg_dump`.
+- **HSTS** in production. No Django SSL-redirect (Render health checks). Sentry initialises only when `SENTRY_DSN` is set. The image installs **postgresql-client-18** from PGDG (`PG_DUMP_BIN`) because Render Postgres is 18 and Debian's client is 17 — `pg_dump` will not dump a newer server.
 
 ## After deploy (producer)
 

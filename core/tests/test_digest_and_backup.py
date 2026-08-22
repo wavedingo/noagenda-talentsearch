@@ -1,9 +1,11 @@
 from io import StringIO
+from unittest.mock import patch
 
 from django.core import mail
 from django.core.management import call_command
 from django.test import TestCase
 
+from core.management.commands.backup_database import _pg_dump
 from core.management.commands.send_admin_digest import build_digest
 
 
@@ -24,3 +26,10 @@ class BackupTests(TestCase):
         out = StringIO()
         call_command("backup_database", stdout=out)
         self.assertIn("private/backups/", out.getvalue())
+
+    @patch.dict("os.environ", {"DATABASE_URL": "postgres://x", "PG_DUMP_BIN": "/usr/lib/postgresql/18/bin/pg_dump"})
+    @patch("core.management.commands.backup_database.subprocess.run")
+    def test_pg_dump_uses_the_versioned_binary(self, run):
+        run.return_value.stdout = b"DUMP"
+        self.assertEqual(_pg_dump(), b"DUMP")
+        self.assertEqual(run.call_args.args[0][0], "/usr/lib/postgresql/18/bin/pg_dump")
