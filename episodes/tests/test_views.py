@@ -55,7 +55,8 @@ class EpisodeListTests(TestCase):
 
     def test_labels_the_floor_so_it_does_not_read_as_a_broken_archive(self):
         response = self.client.get(reverse("episodes:list"))
-        self.assertContains(response, "isn't a full archive")
+        self.assertContains(response, "Vote on your favorite guest-hosts")
+        self.assertContains(response, "isn't a full archive of episodes")
         self.assertContains(response, "1890")
 
     def test_guest_host_badge_is_for_tagged_appearances_not_feed_names(self):

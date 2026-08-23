@@ -3,8 +3,13 @@
 {% block content %}
 <h1>Episodes</h1>
 <p class="page-intro">
-  Episodes since the show's return, newest first. This isn't a full archive —
-  the list starts at episode {{ min_episode_number }}, where the guest-host era begins.
+  Vote on your favorite guest-hosts: Each episode where a guest-host appears
+  will be highlighted below. Click on that appearance to give your
+  producer-feedback.
+</p>
+<p class="note">
+  This isn't a full archive of episodes — the list starts at episode
+  {{ min_episode_number }}, where the guest-host era begins.
 </p>
 
 {% if page_obj.object_list %}
