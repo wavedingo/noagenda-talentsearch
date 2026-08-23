@@ -4,11 +4,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}No Agenda Talent Search{% endblock %}</title>
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="icon" href="{% static 'img/favicon-32.png' %}" sizes="32x32" type="image/png">
+  <link rel="icon" href="{% static 'img/favicon-16.png' %}" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon-dark.png' %}" media="(prefers-color-scheme: light)">
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon-light.png' %}" media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon-dark.png' %}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{% block og_title %}No Agenda Talent Search{% endblock %}">
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-image.png' %}">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="{% static 'css/site.css' %}">
 </head>
 <body>
   <header class="site-header">
-    <a class="site-title" href="{% url 'core:home' %}">No Agenda Talent Search</a>
+    <a class="site-title" href="{% url 'core:home' %}">
+      <picture>
+        <source srcset="{% static 'img/logo-light.svg' %}" media="(prefers-color-scheme: dark)">
+        <img class="site-logo" src="{% static 'img/logo-dark.svg' %}" alt="No Agenda Talent Search" width="43" height="36" decoding="async">
+      </picture>
+    </a>
     <nav class="site-nav">
       <a href="{% url 'candidates:list' %}">Candidates</a>
       <a href="{% url 'episodes:list' %}">Episodes</a>
