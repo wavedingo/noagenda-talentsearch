@@ -20,6 +20,11 @@ class AccountViewTests(TestCase):
         response = self.client.get(reverse("accounts:account"))
         self.assertContains(response, "Old Name")
 
+    def test_logout_button_is_on_the_account_page(self):
+        response = self.client.get(reverse("accounts:account"))
+        self.assertContains(response, 'action="/logout/"')
+        self.assertContains(response, "Log out")
+
     def test_post_updates_display_name(self):
         self.client.post(reverse("accounts:account"), {"display_name": "New Name"})
         self.user.refresh_from_db()

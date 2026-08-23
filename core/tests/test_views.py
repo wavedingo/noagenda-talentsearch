@@ -1,5 +1,6 @@
 from django.core.cache import cache
 from django.test import TestCase
+from django.urls import reverse
 
 from core.models import Settings
 
@@ -15,6 +16,15 @@ class HomeTests(TestCase):
     def test_home_returns_200(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
+
+    def test_home_shows_action_buttons_and_updated_copy(self):
+        response = self.client.get("/")
+        self.assertContains(response, "The producer-driven audition for the show's next guest-host.")
+        self.assertContains(response, "Rate Guest Appearances")
+        self.assertContains(response, "Discover Talent")
+        self.assertContains(response, reverse("episodes:list"))
+        self.assertContains(response, reverse("candidates:list"))
+        self.assertNotContains(response, "Log out")
 
 
 class BrandingTests(TestCase):
