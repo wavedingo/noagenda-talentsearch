@@ -37,6 +37,13 @@ class EpisodeListTests(TestCase):
         numbers = [e.episode_number for e in response.context["page_obj"]]
         self.assertEqual(numbers, [1896, 1893, 1890])
 
+    def test_entire_episode_card_links_to_the_detail_page(self):
+        make_episode(1896)
+        response = self.client.get(reverse("episodes:list"))
+        detail = reverse("episodes:detail", args=[1896])
+        self.assertContains(response, f'class="episode-card-link" href="{detail}"')
+        self.assertNotContains(response, f'<a href="{detail}">1896')
+
     def test_paginates_at_twenty(self):
         for number in range(1890, 1890 + EPISODES_PER_PAGE + 5):
             make_episode(number)
