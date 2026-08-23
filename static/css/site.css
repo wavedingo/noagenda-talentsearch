@@ -210,13 +210,30 @@ h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
 }
 
 .candidate-card {
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.candidate-card-link {
   display: flex;
   gap: 1rem;
   align-items: center;
   padding: 0.85rem;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  text-decoration: none;
+  color: inherit;
+  border-radius: inherit;
+}
+
+.candidate-card-link:hover,
+.candidate-card-link:focus-visible {
+  outline: none;
+}
+
+.candidate-card:has(.candidate-card-link:hover),
+.candidate-card:has(.candidate-card-link:focus-visible) {
+  border-color: var(--accent);
 }
 
 .candidate-photo {
@@ -234,10 +251,13 @@ h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
   margin: 0 0 0.15rem;
   font-size: 1.05rem;
   font-weight: 600;
+  color: var(--ink);
 }
 
-.candidate-name a { text-decoration: none; color: var(--ink); }
-.candidate-name a:hover { color: var(--accent); }
+.candidate-card-link:hover .candidate-name,
+.candidate-card-link:focus-visible .candidate-name {
+  color: var(--accent);
+}
 
 .candidate-snippet { margin: 0.25rem 0 0; }
 

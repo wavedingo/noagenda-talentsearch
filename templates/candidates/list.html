@@ -20,18 +20,7 @@
   <ul class="candidate-grid">
     {% for candidate in page_obj %}
       <li class="candidate-card">
-        {% if candidate.photo_url %}
-          <img class="candidate-photo" src="{{ candidate.photo_url }}" alt="" loading="lazy" width="72" height="72">
-        {% else %}
-          <span class="candidate-photo" aria-hidden="true"></span>
-        {% endif %}
-        <div class="candidate-body">
-          <p class="candidate-name">
-            <a href="{% url 'candidates:detail' candidate.slug %}">{{ candidate.stage_name }}</a>
-          </p>
-          {% if candidate.is_featured %}<span class="badge">Featured</span>{% endif %}
-          {% if candidate.bio %}<p class="note candidate-snippet">{{ candidate.bio|truncatewords:22 }}</p>{% endif %}
-        </div>
+        {% include "ratings/_candidate_card.html" with show_bio=True %}
       </li>
     {% endfor %}
   </ul>
