@@ -17,6 +17,20 @@ class HomeTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
+class BrandingTests(TestCase):
+    def test_header_logo_and_favicons_are_linked(self):
+        response = self.client.get("/")
+        self.assertContains(response, 'class="site-logo"')
+        self.assertContains(response, 'alt="No Agenda Talent Search"')
+        self.assertContains(response, "/static/img/logo-dark.svg")
+        self.assertContains(response, "/static/img/logo-light.svg")
+        self.assertContains(response, 'rel="icon"')
+        self.assertContains(response, "/static/img/favicon.svg")
+        self.assertContains(response, "/static/img/apple-touch-icon-dark.png")
+        self.assertContains(response, "/static/img/apple-touch-icon-light.png")
+        self.assertContains(response, "/static/img/og-image.png")
+
+
 class AboutTests(TestCase):
     def test_about_returns_200(self):
         response = self.client.get("/about/")
