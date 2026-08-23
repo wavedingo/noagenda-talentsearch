@@ -11,22 +11,7 @@
   <ul class="episode-list">
     {% for episode in page_obj %}
       <li class="episode-card">
-        {% if episode.artwork_url %}
-          <img class="episode-art" src="{{ episode.artwork_url }}" alt="" loading="lazy" width="72" height="72">
-        {% else %}
-          <span class="episode-art" aria-hidden="true"></span>
-        {% endif %}
-        <div class="episode-body">
-          <p class="episode-title">
-            <a href="{% url 'episodes:detail' episode.episode_number %}">{{ episode.episode_number }} — {{ episode.title_display }}</a>
-          </p>
-          <p class="episode-meta">
-            {{ episode.published_at|date:"j F Y" }}{% if episode.duration_display %} · {{ episode.duration_display }}{% endif %}
-          </p>
-          {% if episode.appearances.all %}
-            <span class="badge">Guest host: {% for appearance in episode.appearances.all %}{{ appearance.display_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
-          {% endif %}
-        </div>
+        {% include "episodes/_episode_card.html" with show_duration=True %}
       </li>
     {% endfor %}
   </ul>

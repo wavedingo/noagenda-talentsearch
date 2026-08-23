@@ -93,13 +93,30 @@ h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
 }
 
 .episode-card {
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.episode-card-link {
   display: flex;
   gap: 1rem;
   align-items: center;
   padding: 0.85rem;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  text-decoration: none;
+  color: inherit;
+  border-radius: inherit;
+}
+
+.episode-card-link:hover,
+.episode-card-link:focus-visible {
+  outline: none;
+}
+
+.episode-card:has(.episode-card-link:hover),
+.episode-card:has(.episode-card-link:focus-visible) {
+  border-color: var(--accent);
 }
 
 .episode-art {
@@ -117,10 +134,13 @@ h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
   margin: 0 0 0.15rem;
   font-size: 1.05rem;
   font-weight: 600;
+  color: var(--ink);
 }
 
-.episode-title a { text-decoration: none; color: var(--ink); }
-.episode-title a:hover { color: var(--accent); }
+.episode-card-link:hover .episode-title,
+.episode-card-link:focus-visible .episode-title {
+  color: var(--accent);
+}
 
 .episode-meta {
   margin: 0;
