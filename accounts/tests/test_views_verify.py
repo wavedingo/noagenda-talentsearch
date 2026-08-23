@@ -14,8 +14,8 @@ class VerifyMagicLinkTests(TestCase):
         response = self.client.get(reverse("accounts:verify", args=[raw_token]))
         self.assertRedirects(response, reverse("core:home"))
         # Confirm the session actually authenticated the user on a follow-up request.
-        home = self.client.get(reverse("core:home"))
-        self.assertContains(home, "producer@example.com")
+        account = self.client.get(reverse("accounts:account"))
+        self.assertContains(account, "producer@example.com")
 
     def test_valid_token_sets_email_verified_at(self):
         raw_token = create_magic_link(self.user)

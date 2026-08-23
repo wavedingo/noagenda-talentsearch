@@ -266,6 +266,21 @@ audio {
   margin: 0.25rem 0 0.5rem;
 }
 
+/* Home page */
+
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.25rem 0 0.75rem;
+}
+
+a.button {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}
+
 /* Audition workspace */
 
 .cta { font-size: 1.1rem; font-weight: 600; margin: 1.25rem 0 0.25rem; }
@@ -323,7 +338,8 @@ audio {
   font-size: 0.9rem;
 }
 
-button {
+button,
+a.button {
   font: inherit;
   font-weight: 600;
   padding: 0.5rem 1rem;

@@ -1,28 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>No Agenda Talent Search</h1>
-<p class="page-intro">The community-driven audition for the show's next co-host.</p>
+<p class="page-intro">The producer-driven audition for the show's next guest-host.</p>
+
+<div class="home-actions">
+  {% if auditions_open %}
+    <a class="button" href="{% url 'candidates:audition' %}">Audition for the Show</a>
+  {% endif %}
+  <a class="button" href="{% url 'episodes:list' %}">Rate Guest Appearances</a>
+  <a class="button" href="{% url 'candidates:list' %}">Discover Talent</a>
+</div>
 
 {% if auditions_open %}
-  <p class="cta">
-    <a href="{% url 'candidates:audition' %}">Audition for the show →</a>
-  </p>
   <p class="note">
-    Send a demo tape, the audience listens, the show decides. Everything is reviewed
+    Send a demo tape, the producers listen, the show decides. Everything is reviewed
     before it goes public.
   </p>
-{% endif %}
-
-{% if user.is_authenticated %}
-  <div class="note">
-    Signed in as {{ user.email }}.
-    <form method="post" action="{% url 'accounts:logout' %}" style="display:inline">
-      {% csrf_token %}
-      <button type="submit">Log out</button>
-    </form>
-  </div>
-{% else %}
-  <p><a href="{% url 'accounts:request_link' %}">Log in or sign up</a></p>
 {% endif %}
 
 {% if favorites or rising %}
