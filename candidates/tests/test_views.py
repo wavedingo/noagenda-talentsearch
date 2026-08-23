@@ -33,6 +33,13 @@ class CandidateListTests(ViewTestCase):
         response = self.client.get(reverse("candidates:list"))
         self.assertContains(response, "Live One")
 
+    def test_entire_candidate_card_links_to_the_profile(self):
+        response = self.client.get(reverse("candidates:list"))
+        detail = reverse("candidates:detail", args=[self.live.slug])
+        self.assertContains(response, f'class="candidate-card-link" href="{detail}"')
+        # Name is no longer a nested link — the whole card is the hit target.
+        self.assertNotContains(response, f'<a href="{detail}">Live One</a>')
+
     def test_hides_every_other_status(self):
         for index, status in enumerate(
             [

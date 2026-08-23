@@ -1,11 +1,14 @@
-{% if candidate.photo_url %}
-  <img class="candidate-photo" src="{{ candidate.photo_url }}" alt="" loading="lazy" width="72" height="72">
-{% else %}
-  <span class="candidate-photo" aria-hidden="true"></span>
-{% endif %}
-<div class="candidate-body">
-  <p class="candidate-name">
-    <a href="{% url 'candidates:detail' candidate.slug %}">{{ candidate.stage_name }}</a>
-  </p>
-  {% if candidate.is_featured %}<span class="badge">Featured</span>{% endif %}
-</div>
+<a class="candidate-card-link" href="{% url 'candidates:detail' candidate.slug %}">
+  {% if candidate.photo_url %}
+    <img class="candidate-photo" src="{{ candidate.photo_url }}" alt="" loading="lazy" width="72" height="72">
+  {% else %}
+    <span class="candidate-photo" aria-hidden="true"></span>
+  {% endif %}
+  <div class="candidate-body">
+    <p class="candidate-name">{{ candidate.stage_name }}</p>
+    {% if candidate.is_featured %}<span class="badge">Featured</span>{% endif %}
+    {% if show_bio and candidate.bio %}
+      <p class="note candidate-snippet">{{ candidate.bio|truncatewords:22 }}</p>
+    {% endif %}
+  </div>
+</a>
