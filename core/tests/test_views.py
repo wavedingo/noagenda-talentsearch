@@ -32,13 +32,29 @@ class BrandingTests(TestCase):
         response = self.client.get("/")
         self.assertContains(response, 'class="site-logo"')
         self.assertContains(response, 'alt="No Agenda Talent Search"')
-        self.assertContains(response, "/static/img/logo-dark.svg")
-        self.assertContains(response, "/static/img/logo-light.svg")
         self.assertContains(response, 'rel="icon"')
         self.assertContains(response, "/static/img/favicon.svg")
-        self.assertContains(response, "/static/img/apple-touch-icon-dark.png")
-        self.assertContains(response, "/static/img/apple-touch-icon-light.png")
         self.assertContains(response, "/static/img/og-image.png")
+
+    def test_branding_is_dark_only(self):
+        """The site has no light theme (refresh decision 3), so the logo and
+        touch icon are the light-on-dark pair unconditionally -- nothing is
+        selected by prefers-color-scheme any more."""
+        response = self.client.get("/")
+        self.assertContains(response, "/static/img/logo-light.svg")
+        self.assertNotContains(response, "/static/img/logo-dark.svg")
+        self.assertContains(response, "/static/img/apple-touch-icon-light.png")
+        self.assertNotContains(response, "/static/img/apple-touch-icon-dark.png")
+        self.assertNotContains(response, "prefers-color-scheme")
+        self.assertContains(response, '<meta name="color-scheme" content="dark">')
+
+    def test_self_hosted_fonts_are_linked_and_google_is_not_called(self):
+        """Decision 12: faces are served from our own origin. Reverting to
+        Google Fonts is deliberate work, not something that creeps back in."""
+        response = self.client.get("/")
+        self.assertContains(response, "/static/css/fonts.css")
+        self.assertNotContains(response, "fonts.googleapis.com")
+        self.assertNotContains(response, "fonts.gstatic.com")
 
 
 class AboutTests(TestCase):

@@ -1,30 +1,49 @@
 /* Mobile-first, no framework (spec B.5: most of this audience is on a phone,
-   often listening while browsing). Deliberately small -- a full design pass
-   over every page is a later job. */
+   often listening while browsing). Dark-only -- see design decision 3 in
+   docs/superpowers/specs/2026-08-24-website-refresh-design.md. */
 
 :root {
-  --bg: #faf9f7;
-  --surface: #ffffff;
-  --ink: #1c1b19;
-  --ink-soft: #5f5c57;
-  --line: #e2ded7;
-  --accent: #9a3412;
-  --ok: #2f6f4f;
-  --bad: #a13333;
-  --radius: 10px;
-}
+  color-scheme: dark;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #171614;
-    --surface: #201f1c;
-    --ink: #f2efe9;
-    --ink-soft: #a9a49b;
-    --line: #33312c;
-    --accent: #f4a261;
-    --ok: #7bbf95;
-    --bad: #e78585;
-  }
+  --bg: #1c191f;
+  --bg-deep: #141217;
+  --surface: #27232c;
+  --surface-2: #302c36;
+  --ink: #f7f3eb;
+  --ink-soft: #b8b0a6;
+  --faint: #908880;        /* on --bg only -- 3.91:1 on --surface-2, fails AA */
+  --line: #433e48;
+
+  /* Cream primary-button fill. NOT a link colour -- see decision 13. */
+  --accent: #f7f3eb;
+  --accent-fg: #1a171c;
+
+  /* Gels light the room: borders, tape, washes. Neither passes AA as text,
+     so anything that spells words uses the -text variants. */
+  --gel-magenta: #d4527e;
+  --gel-blue: #5a4ecf;
+  --gel-magenta-text: #dd7a99;
+  --gel-blue-text: #a198dc;
+
+  /* Ratings only. There is no other gold in this UI. */
+  --star: #daa520;
+  --star-hot: #e8b923;
+
+  --ok: #7bbf95;
+  --bad: #e78585;
+
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+  --radius: var(--radius-md);   /* alias: pre-refresh rules still reference it */
+
+  --font-display: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --font-sans: "Figtree", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mark: "Shantell Sans", "Segoe Script", cursive;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 * { box-sizing: border-box; }
@@ -33,11 +52,29 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 400 16px/1.6 var(--font-sans);
   -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-a { color: var(--accent); }
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+
+:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--ink) 70%, transparent);
+  outline-offset: 3px;
+}
+
+/* Links carry an underline rather than a colour: magenta and blue are stage
+   gels, never link colours, and cream-on-dark alone reads as body text. */
+a {
+  color: var(--ink);
+  text-decoration-color: color-mix(in oklab, var(--ink) 45%, transparent);
+  text-underline-offset: 0.18em;
+}
+
+a:hover { text-decoration-color: var(--ink); }
 
 .site-header {
   display: flex;
@@ -116,7 +153,7 @@ h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
 
 .episode-card:has(.episode-card-link:hover),
 .episode-card:has(.episode-card-link:focus-visible) {
-  border-color: var(--accent);
+  border-color: color-mix(in oklab, var(--ink) 30%, transparent);
 }
 
 .episode-art {
@@ -137,11 +174,6 @@ h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
   color: var(--ink);
 }
 
-.episode-card-link:hover .episode-title,
-.episode-card-link:focus-visible .episode-title {
-  color: var(--accent);
-}
-
 .episode-meta {
   margin: 0;
   color: var(--ink-soft);
@@ -153,8 +185,8 @@ h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
   margin-top: 0.35rem;
   padding: 0.1rem 0.5rem;
   border-radius: 999px;
-  border: 1px solid var(--accent);
-  color: var(--accent);
+  border: 1px solid color-mix(in oklab, var(--ink) 22%, transparent);
+  color: var(--ink-soft);
   font-size: 0.78rem;
   font-weight: 600;
 }
@@ -253,7 +285,7 @@ h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
 
 .candidate-card:has(.candidate-card-link:hover),
 .candidate-card:has(.candidate-card-link:focus-visible) {
-  border-color: var(--accent);
+  border-color: color-mix(in oklab, var(--ink) 30%, transparent);
 }
 
 .candidate-photo {
@@ -272,11 +304,6 @@ h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--ink);
-}
-
-.candidate-card-link:hover .candidate-name,
-.candidate-card-link:focus-visible .candidate-name {
-  color: var(--accent);
 }
 
 .candidate-snippet { margin: 0.25rem 0 0; }
@@ -382,18 +409,24 @@ button,
 a.button {
   font: inherit;
   font-weight: 600;
-  padding: 0.5rem 1rem;
-  color: var(--surface);
+  min-height: 48px;
+  padding: 0.5rem 1.1rem;
+  color: var(--accent-fg);
   background: var(--accent);
   border: 1px solid var(--accent);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
+  text-decoration: none;
+  transition: transform 150ms var(--ease);
 }
 
+button:active,
+a.button:active { transform: scale(0.96); }
+
 .button-quiet {
-  color: var(--ink-soft);
+  color: var(--ink);
   background: transparent;
-  border-color: var(--line);
+  border-color: color-mix(in oklab, var(--ink) 22%, transparent);
 }
 
 .favorites-list {
@@ -429,10 +462,11 @@ a.button {
   font-size: 1.45rem;
   line-height: 1;
   padding: 0.4rem 0.55rem;
-  color: var(--ink-soft);
+  color: color-mix(in oklab, var(--ink) 35%, transparent);
   background: var(--surface);
   border: 1px solid var(--line);
   margin: 0 0.15rem 0.15rem 0;
 }
 
-.star-form button.star-on { color: var(--accent); border-color: var(--accent); }
+.star-form button.star-on { color: var(--star); border-color: var(--star); }
+.star-form button.star:hover { color: var(--star-hot); }
