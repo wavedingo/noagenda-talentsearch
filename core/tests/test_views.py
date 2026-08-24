@@ -20,11 +20,19 @@ class HomeTests(TestCase):
     def test_home_shows_action_buttons_and_updated_copy(self):
         response = self.client.get("/")
         self.assertContains(response, "The producer-driven audition for the show's next guest-host.")
-        self.assertContains(response, "Rate Guest Appearances")
-        self.assertContains(response, "Discover Talent")
+        self.assertContains(response, "Rate guest appearances")
         self.assertContains(response, reverse("episodes:list"))
         self.assertContains(response, reverse("candidates:list"))
         self.assertNotContains(response, "Log out")
+
+    def test_discover_talent_survives_an_empty_board(self):
+        """It lives on the Currently leading card, which only renders when a
+        rising demo exists -- so the empty state has to keep it or the button
+        disappears from the home page entirely."""
+        response = self.client.get("/")
+        self.assertNotContains(response, "Currently leading")
+        self.assertContains(response, "Discover Talent")
+        self.assertContains(response, "Not a vote")
 
 
 class BrandingTests(TestCase):
@@ -50,7 +58,14 @@ class BrandingTests(TestCase):
         response = self.client.get("/")
         self.assertContains(response, 'class="marquee" aria-hidden="true"')
         self.assertContains(response, "Troll room is listening", count=2)
-        self.assertNotContains(response, "Not a vote")
+
+    def test_not_a_vote_is_a_page_module_never_a_ticker_phrase(self):
+        """A slogan scrolling past in a bumper loop trivialises the one thing
+        the site most needs people to believe."""
+        response = self.client.get("/")
+        html = response.content.decode()
+        self.assertNotIn('marquee-item">Not a vote', html)
+        self.assertIn("Not a vote", html)
 
     def test_footer_is_present_on_every_page(self):
         for path in ("/", "/candidates/", "/episodes/", "/about/", "/leaderboard/"):

@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 
 from episodes.models import Episode
-from ratings.services import community_favorites, rising_demos
+from ratings.services import attach_demo_summaries, community_favorites, rising_demos
 
 from .settings_util import get_setting
 
@@ -17,13 +17,21 @@ def home(request):
     # Rising Demos stand in until someone has been tagged on an episode, so
     # the home page isn't an empty "community favorites" heading.
     rising = [] if favorites else rising_demos()[:HOME_FAVORITE_COUNT]
+
+    # "Currently leading" is always the top Rising Demo -- the best-rated tape
+    # among candidates who have *not* been on the show yet. That keeps it
+    # complementary to the board below rather than a copy of its first cell:
+    # once guest hosts exist the board becomes Community Favorites and this
+    # still shows who is coming up behind them.
+    leading = attach_demo_summaries(rising_demos()[:1])
     return render(
         request,
         "core/home.html",
         {
             "latest_episodes": Episode.objects.prefetch_related("appearances").all()[:HOME_EPISODE_COUNT],
-            "favorites": favorites,
-            "rising": rising,
+            "favorites": attach_demo_summaries(favorites),
+            "rising": attach_demo_summaries(rising),
+            "leading": leading[0] if leading else None,
             "auditions_open": get_setting("auditions_open"),
         },
     )

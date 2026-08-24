@@ -24,11 +24,10 @@ get the stage treatment, on their own page they get their actual face.
     <span class="polaroid-caption">{{ candidate.stage_name }}</span>
   </span>
 </a>
-{% if candidate.is_featured or show_bio and candidate.bio %}
-  <div class="polaroid-meta">
-    {% if candidate.is_featured %}<span class="stamp">Featured</span>{% endif %}
-    {% if show_bio and candidate.bio %}
-      <p class="note candidate-snippet">{{ candidate.bio|truncatewords:12 }}</p>
-    {% endif %}
-  </div>
-{% endif %}
+<div class="polaroid-meta">
+  {% if candidate.is_featured %}<span class="stamp">Featured</span>{% endif %}
+  {% if show_bio and candidate.bio %}
+    <p class="note candidate-snippet">{{ candidate.bio|truncatewords:12 }}</p>
+  {% endif %}
+  {% if show_stars %}{% include "ratings/_stars.html" with summary=candidate.demo_summary %}{% endif %}
+</div>

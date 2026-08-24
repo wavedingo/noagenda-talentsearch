@@ -1,18 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Community favorites — No Agenda Talent Search{% endblock %}
 {% block content %}
-<h1>Community favorites</h1>
+<div class="section-head">
+  <span class="stamp">The board</span>
+  <h1>Community favorites</h1>
+</div>
 <p class="page-intro">
   Producers float the candidates they connect with. These standings inform the
   show's decision; they don't make it.
 </p>
 
-<h2>Show Appearances</h2>
+<h2>Show appearances</h2>
 {% if favorites %}
   <ul class="favorites-list">
     {% for candidate in favorites %}
-      <li class="candidate-card">
-        {% include "ratings/_candidate_card.html" %}
+      <li class="board-item">
+        {% include "ratings/_candidate_row.html" %}
       </li>
     {% endfor %}
   </ul>
@@ -28,8 +31,8 @@
 {% if rising %}
   <ul class="favorites-list">
     {% for candidate in rising %}
-      <li class="candidate-card">
-        {% include "ratings/_candidate_card.html" %}
+      <li class="board-item">
+        {% include "ratings/_candidate_row.html" %}
       </li>
     {% endfor %}
   </ul>

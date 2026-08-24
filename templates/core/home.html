@@ -1,40 +1,122 @@
 {% extends "base.html" %}
+{% load static stagecraft %}
 {% block content %}
-<h1>No Agenda Talent Search</h1>
-<p class="page-intro">The producer-driven audition for the show's next guest-host.</p>
 
-<div class="home-actions">
-  {% if auditions_open %}
-    <a class="button" href="{% url 'candidates:audition' %}">Audition for the Show</a>
+<section class="hero">
+  {% comment %}
+    The overlay runs left-to-right, not as a centre vignette: the type has to
+    stay readable on the left while the mics stay visible on the right.
+  {% endcomment %}
+  <picture class="hero-image">
+    <source type="image/webp" media="(min-width: 800px)" srcset="{% static 'img/hero-1792.webp' %}">
+    <source type="image/webp" srcset="{% static 'img/hero-900.webp' %}">
+    <source media="(min-width: 800px)" srcset="{% static 'img/hero-1792.jpg' %}">
+    <img src="{% static 'img/hero-900.jpg' %}" alt="" width="1792" height="1008" fetchpriority="high" decoding="async">
+  </picture>
+  <div class="hero-copy">
+    <span class="stamp">In the morning</span>
+    <h1 class="hero-title"><span>Talent</span><span>Search</span></h1>
+    <p class="hero-lede">
+      The producer-driven audition for the show's next guest-host. Send a demo
+      tape, the producers listen, the show decides.
+    </p>
+    <div class="hero-actions">
+      {% if auditions_open %}
+        <a class="button" href="{% url 'candidates:audition' %}">Audition for the Show</a>
+      {% endif %}
+      <a class="button button-quiet" href="{% url 'episodes:list' %}">Rate guest appearances</a>
+    </div>
+    <p class="note hero-fine">
+      Everything is reviewed before it goes public. Ratings inform the chair —
+      they don't fill it.
+    </p>
+  </div>
+</section>
+
+<div class="feature-row">
+  {% if leading %}
+    <section class="leading">
+      <a class="polaroid-link leading-polaroid" href="{% url 'candidates:detail' leading.slug %}">
+        <span class="polaroid" style="--tilt: {{ leading.slug|tilt }}">
+          <span class="polaroid-photo leading-photo{% if leading.photo_url %} photo-gel{% endif %}">
+            {% if leading.photo_url %}
+              <img src="{{ leading.photo_url }}" alt="" decoding="async">
+            {% else %}
+              <span class="polaroid-empty" aria-hidden="true">?</span>
+            {% endif %}
+          </span>
+          <span class="polaroid-caption">{{ leading.stage_name }}</span>
+        </span>
+      </a>
+      <div class="leading-copy">
+        <span class="stamp stamp-blue">Currently leading</span>
+        <p class="note">
+          Highest-rated demo among candidates who haven't guest-hosted yet.
+          Not a vote — just who's landing with producers right now.
+        </p>
+        {% include "ratings/_stars.html" with summary=leading.demo_summary %}
+        <p><a href="{% url 'candidates:detail' leading.slug %}">Listen to the tape →</a></p>
+        <a class="button button-quiet" href="{% url 'candidates:list' %}">Discover Talent</a>
+      </div>
+    </section>
+  {% else %}
+    {% comment %}
+      No rising demo to lead with yet. The slot still renders so the row keeps
+      two cards -- and so Discover Talent, which lives on this card, does not
+      vanish from the home page on a quiet board.
+    {% endcomment %}
+    <section class="leading leading-empty">
+      <div class="leading-copy">
+        <span class="stamp stamp-blue">The board</span>
+        <p class="note">
+          Every producer who has put themselves forward, and whose profile has
+          been reviewed. The tapes go up as they clear moderation.
+        </p>
+        <a class="button button-quiet" href="{% url 'candidates:list' %}">Discover Talent</a>
+      </div>
+    </section>
   {% endif %}
-  <a class="button" href="{% url 'episodes:list' %}">Rate Guest Appearances</a>
-  <a class="button" href="{% url 'candidates:list' %}">Discover Talent</a>
+
+  <section class="taped-note">
+    <span class="stamp">What this is not</span>
+    <h2 class="taped-note-title">Not a vote</h2>
+    <p>
+      The numbers here tell the show who the producers connect with. The final
+      call about who sits in that chair belongs to Adam Curry and the show,
+      full stop.
+    </p>
+    <p><a href="{% url 'core:about' %}#the-compact">The compact →</a></p>
+  </section>
 </div>
 
-{% if auditions_open %}
-  <p class="note">
-    Send a demo tape, the producers listen, the show decides. Everything is reviewed
-    before it goes public.
-  </p>
-{% endif %}
-
 {% if favorites or rising %}
-  <h2>{% if favorites %}Community favorites{% else %}Rising demos{% endif %}</h2>
+  <div class="section-head section-head-row">
+    <div>
+      <span class="stamp">{% if favorites %}Community favorites{% else %}Rising demos{% endif %}</span>
+      <h2>The house is listening</h2>
+    </div>
+    <a href="{% url 'ratings:leaderboard' %}">All favorites →</a>
+  </div>
   {% if not favorites %}
     <p class="note">The main board fills in once guest hosts start appearing on the show.</p>
   {% endif %}
   <ul class="candidate-grid">
     {% for candidate in favorites|default:rising %}
       <li class="candidate-card">
-        {% include "ratings/_candidate_card.html" %}
+        {% include "ratings/_candidate_card.html" with show_bio=True show_stars=True %}
       </li>
     {% endfor %}
   </ul>
-  <p><a href="{% url 'ratings:leaderboard' %}">All favorites →</a></p>
 {% endif %}
 
 {% if latest_episodes %}
-  <h2>Latest episodes</h2>
+  <div class="section-head section-head-row">
+    <div>
+      <span class="stamp stamp-blue">From the feed</span>
+      <h2>Latest episodes</h2>
+    </div>
+    <a href="{% url 'episodes:list' %}">All episodes →</a>
+  </div>
   <ul class="episode-list">
     {% for episode in latest_episodes %}
       <li class="episode-card">
@@ -42,6 +124,5 @@
       </li>
     {% endfor %}
   </ul>
-  <p><a href="{% url 'episodes:list' %}">All episodes →</a></p>
 {% endif %}
 {% endblock %}

@@ -290,3 +290,32 @@ def rising_demos():
         Candidate.objects.public().filter(composite_score__isnull=True)
         .order_by("-demo_score", "-approved_at")[:size]
     )
+
+
+def attach_demo_summaries(candidates):
+    """Attach a public `demo_summary` to each candidate, in one query.
+
+    `Candidate.live_demo` is a property that hits the database, so reading it
+    inside a template loop turns a board of ten polaroids into eleven queries.
+    Both the home board and the leaderboard render rows of candidates, so the
+    fetch happens here instead.
+
+    `demo_summary` is None below `min_votes_to_display`, which the template
+    renders as "No score yet" -- never 0.0 and never an empty star row (B.5).
+    """
+    candidates = list(candidates)
+    if not candidates:
+        return candidates
+
+    threshold = int(get_setting("min_votes_to_display"))
+    latest_by_candidate = {}
+    demos = Demo.objects.filter(
+        candidate__in=candidates, status=Demo.Status.LIVE
+    ).order_by("candidate_id", "-created_at")
+    for demo in demos:
+        latest_by_candidate.setdefault(demo.candidate_id, demo)
+
+    for candidate in candidates:
+        demo = latest_by_candidate.get(candidate.id)
+        candidate.demo_summary = public_rating_summary(demo, threshold) if demo else None
+    return candidates

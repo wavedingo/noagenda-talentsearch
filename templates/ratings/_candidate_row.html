@@ -1,0 +1,27 @@
+{% load stagecraft %}
+{% comment %}
+Ranked row for the board. Only the first three carry a number: spec 1.3 says
+celebrate the top and never publicly rank the bottom, so being 07 of 07 is not
+something this site stamps on a real person who put themselves forward.
+{% endcomment %}
+<a class="board-row" href="{% url 'candidates:detail' candidate.slug %}">
+  {% if forloop.counter <= 3 %}
+    <span class="board-rank" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>
+  {% else %}
+    <span class="board-rank board-rank-blank" aria-hidden="true"></span>
+  {% endif %}
+  <span class="polaroid polaroid-mini board-thumb" style="--tilt: {{ candidate.slug|tilt }}">
+    <span class="polaroid-photo{% if candidate.photo_url %} photo-gel{% endif %}">
+      {% if candidate.photo_url %}
+        <img src="{{ candidate.photo_url }}" alt="" loading="lazy" decoding="async">
+      {% else %}
+        <span class="polaroid-empty" aria-hidden="true">?</span>
+      {% endif %}
+    </span>
+  </span>
+  <span class="board-body">
+    <span class="board-name">{{ candidate.stage_name }}</span>
+    {% if candidate.bio %}<span class="note board-snippet">{{ candidate.bio|truncatewords:16 }}</span>{% endif %}
+    {% include "ratings/_stars.html" with summary=candidate.demo_summary %}
+  </span>
+</a>

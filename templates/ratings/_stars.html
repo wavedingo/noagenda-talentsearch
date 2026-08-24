@@ -1,0 +1,21 @@
+{% load stagecraft %}
+{% comment %}
+Goldenrod is the ratings colour and nothing else on this site uses it.
+Below the display threshold `summary` is None and this says so in words --
+never 0.0, never an empty row that reads as a bad score (spec B.5).
+{% endcomment %}
+{% if summary %}
+  <p class="stars">
+    <span class="stars-glyphs" aria-hidden="true">
+      {% with filled=summary.average|star_fill %}
+        {% for _ in "12345" %}{% if forloop.counter <= filled %}★{% else %}☆{% endif %}{% endfor %}
+      {% endwith %}
+    </span>
+    <span class="stars-value">{{ summary.average|floatformat:1 }} · {{ summary.count }} rating{{ summary.count|pluralize }}</span>
+  </p>
+{% else %}
+  <p class="stars stars-empty">
+    <span class="stars-glyphs" aria-hidden="true">☆☆☆☆☆</span>
+    <span class="stars-value">No score yet</span>
+  </p>
+{% endif %}

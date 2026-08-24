@@ -23,7 +23,7 @@ class LeaderboardViewTests(RatingsTestCase):
         response = self.client.get(reverse("ratings:leaderboard"))
         self.assertContains(response, "New Voice")
         self.assertContains(response, "The main board fills in")
-        self.assertContains(response, 'class="polaroid-link"')
+        self.assertContains(response, 'class="board-row"')
 
     def test_no_raw_template_syntax_reaches_the_page(self):
         body = self.client.get(reverse("ratings:leaderboard")).content.decode()
@@ -138,3 +138,22 @@ class CandidateListTopSortTests(RatingsTestCase):
         body = self.client.get(reverse("candidates:list"), {"sort": "top"}).content.decode()
         self.assertLess(body.index("High Score"), body.index("Low Score"))
         self.assertEqual(self.client.get(reverse("candidates:list"), {"sort": "top"}).context["sort"], "top")
+
+
+class BoardOrdinalTests(RatingsTestCase):
+    def test_only_the_top_three_rows_carry_a_number(self):
+        """Spec 1.3: celebrate the top, never publicly rank the bottom. The
+        mock numbers every row; being 07 of 07 is not something this site
+        stamps on someone who put themselves forward in public."""
+        for n in range(5):
+            make_candidate(
+                email=f"voice{n}@example.com",
+                stage_name=f"Voice {n}",
+                status=Candidate.Status.LIVE,
+            )
+        response = self.client.get(reverse("ratings:leaderboard"))
+        html = response.content.decode()
+        self.assertIn('class="board-rank" aria-hidden="true">01', html)
+        self.assertIn('class="board-rank" aria-hidden="true">03', html)
+        self.assertNotIn(">04", html)
+        self.assertIn("board-rank-blank", html)

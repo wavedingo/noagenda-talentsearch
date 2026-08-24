@@ -27,3 +27,15 @@ def tilt(value):
     checksum = zlib.crc32(str(value).encode("utf-8"))
     offset = (checksum % 2001) / 1000 - 1  # -1.0 .. 1.0
     return f"{offset * TILT_SPAN:.2f}deg"
+
+
+@register.filter
+def star_fill(average):
+    """How many of the five glyphs are filled for a given average.
+
+    Clamped so a bad aggregate can never render six stars or a negative row.
+    """
+    try:
+        return max(0, min(5, int(round(float(average)))))
+    except (TypeError, ValueError):
+        return 0

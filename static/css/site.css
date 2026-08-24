@@ -642,20 +642,162 @@ audio {
   margin: 0.25rem 0 0.5rem;
 }
 
-/* Home page */
-
-.home-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin: 1.25rem 0 0.75rem;
-}
+/* Home page ------------------------------------------------------------- */
 
 a.button {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-decoration: none;
   text-align: center;
 }
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  margin: 0 0 3.5rem;
+  display: flex;
+  align-items: center;
+  min-height: 26rem;
+}
+
+.hero-image {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+}
+
+.hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Left-to-right, not a centre vignette: type stays readable on the left and
+   the mics stay visible on the right. */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(to right,
+      var(--bg) 5%,
+      color-mix(in oklab, var(--bg) 80%, transparent) 40%,
+      transparent 80%),
+    linear-gradient(to top,
+      color-mix(in oklab, var(--bg) 70%, transparent),
+      transparent 45%);
+}
+
+.hero-copy {
+  padding: 2.5rem 1.75rem;
+  max-width: 34rem;
+}
+
+.hero-title {
+  display: grid;
+  font-size: clamp(3.2rem, 12vw, 7.2rem);
+  margin: 0.9rem 0 1rem;
+}
+
+.hero-lede {
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  margin: 0 0 1.5rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+}
+
+.hero-fine { margin: 0; color: var(--faint); }
+
+/* Leading demo + Not a vote. items-start so the note is not stretched to the
+   polaroid's height -- the mock is explicit that this row should not be one
+   tall portrait dwarfing the panel beside it. */
+.feature-row {
+  display: grid;
+  gap: 1.75rem;
+  align-items: start;
+  margin: 0 0 1rem;
+}
+
+@media (min-width: 900px) {
+  .feature-row { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+}
+
+.leading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1.5rem;
+}
+
+.leading-polaroid { flex: 0 0 auto; width: min(16rem, 100%); }
+
+/* 6:5 rather than a tall 4:5 -- a portrait stacked above copy shoves the
+   whole page down and dwarfs the note beside it. */
+.leading-photo { aspect-ratio: 6 / 5; }
+
+.leading-copy {
+  flex: 1 1 12rem;
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+}
+
+.leading-copy p { margin: 0; }
+
+.taped-note {
+  background: var(--surface-2);
+  border: 1px dashed color-mix(in oklab, var(--ink) 22%, transparent);
+  border-radius: var(--radius-xl);
+  padding: 1.75rem;
+  transform: rotate(1.4deg);
+}
+
+.taped-note-title { margin: 0.85rem 0 0.75rem; font-size: clamp(1.8rem, 4vw, 2.4rem); }
+
+.taped-note p { margin: 0 0 0.85rem; }
+.taped-note p:last-child { margin: 0; }
+
+/* Section heading with a trailing link on the same line. */
+.section-head-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+/* Stars ----------------------------------------------------------------- */
+
+.stars {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.5rem;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.stars-glyphs {
+  color: var(--star);
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.stars-value { color: var(--ink-soft); }
+
+.stars-empty .stars-glyphs { color: color-mix(in oklab, var(--ink) 28%, transparent); }
 
 /* Audition workspace */
 
@@ -830,4 +972,60 @@ a.button:active { transform: scale(0.96); }
   font-family: var(--font-mark);
   font-size: 2.4rem;
   color: color-mix(in oklab, var(--ink) 22%, transparent);
+}
+
+/* Board rows ------------------------------------------------------------ */
+
+.favorites-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.board-item { min-width: 0; }
+
+.board-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--ink) 8%, transparent);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 150ms var(--ease);
+}
+
+.board-row:hover,
+.board-row:focus-visible { border-color: color-mix(in oklab, var(--ink) 26%, transparent); }
+
+.board-rank {
+  flex: none;
+  width: 2.2rem;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--faint);
+}
+
+.board-thumb { flex: none; width: 4.2rem; }
+
+.board-body {
+  min-width: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.board-name { font-weight: 600; }
+
+.board-snippet {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .board-rank { width: 1.5rem; font-size: 1.2rem; }
+  .board-snippet { display: none; }
 }

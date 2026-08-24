@@ -9,6 +9,7 @@ from .forms import RatingForm
 from .ratelimit import rating_rate_limited
 from .services import (
     RatingError,
+    attach_demo_summaries,
     community_favorites,
     rising_demos,
     submit_rating,
@@ -16,8 +17,8 @@ from .services import (
 
 
 def leaderboard(request):
-    favorites = community_favorites()
-    rising = rising_demos()
+    favorites = attach_demo_summaries(community_favorites())
+    rising = attach_demo_summaries(rising_demos())
     return render(
         request,
         "ratings/leaderboard.html",
