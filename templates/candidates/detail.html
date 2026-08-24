@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load stagecraft %}
 {% block title %}{{ candidate.stage_name }} — No Agenda Talent Search{% endblock %}
 {% block main_modifier %}site-main-prose{% endblock %}
 {% block content %}
@@ -12,13 +13,22 @@
 {% endif %}
 
 <div class="candidate-detail-head">
+  {% comment %}
+    No photo-gel here on purpose: the board tints every headshot so the wall
+    reads as one stage, but a producer's own page shows their actual face.
+  {% endcomment %}
   {% if candidate.photo_url %}
-    <img class="candidate-detail-photo" src="{{ candidate.photo_url }}"
-         alt="Photo of {{ candidate.stage_name }}" width="160" height="160">
+    <span class="polaroid polaroid-detail" style="--tilt: {{ candidate.slug|tilt }}">
+      <span class="polaroid-photo">
+        <img src="{{ candidate.photo_url }}" alt="Photo of {{ candidate.stage_name }}"
+             width="220" height="220" decoding="async">
+      </span>
+      <span class="polaroid-caption">{{ candidate.stage_name }}</span>
+    </span>
   {% endif %}
   <div>
     <h1>{{ candidate.stage_name }}</h1>
-    {% if candidate.is_featured %}<span class="badge">Featured</span>{% endif %}
+    {% if candidate.is_featured %}<span class="stamp">Featured</span>{% endif %}
   </div>
 </div>
 

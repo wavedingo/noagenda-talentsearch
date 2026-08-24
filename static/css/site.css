@@ -217,6 +217,137 @@ body::after {
 
 .site-nav .site-nav-cta:hover { color: var(--accent-fg); }
 
+/* Stamps ---------------------------------------------------------------- */
+
+/* Text uses the lightened variants: the raw gels are 4.39:1 and 2.84:1 on the
+   page background, and a stamp at 0.82rem is not large text. */
+.stamp {
+  display: inline-block;
+  font-family: var(--font-mark);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.18em 0.55em;
+  border: 2px solid var(--gel-magenta);
+  border-radius: var(--radius-xs);
+  color: var(--gel-magenta-text);
+  transform: rotate(-2.5deg);
+}
+
+.stamp-blue {
+  border-color: var(--gel-blue);
+  color: var(--gel-blue-text);
+  transform: rotate(2deg);
+}
+
+/* Polaroid -------------------------------------------------------------- */
+
+.polaroid-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.polaroid {
+  position: relative;
+  display: block;
+  background: var(--accent);
+  color: var(--accent-fg);
+  padding: 0.45rem 0.45rem 2.1rem;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 10px 28px rgba(0, 0, 0, 0.38);
+  transform: rotate(var(--tilt, -1.2deg));
+  transition:
+    transform 200ms var(--ease),
+    box-shadow 200ms var(--ease);
+}
+
+/* Tape across the top edge. */
+.polaroid::before {
+  content: "";
+  position: absolute;
+  top: -0.45rem;
+  left: 50%;
+  width: 2.6rem;
+  height: 0.7rem;
+  translate: -50% 0;
+  rotate: -8deg;
+  background: color-mix(in oklab, var(--gel-magenta) 35%, transparent);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.polaroid-link:hover .polaroid,
+.polaroid-link:focus-visible .polaroid {
+  transform: rotate(0deg) translateY(-4px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 16px 36px rgba(0, 0, 0, 0.45);
+}
+
+.polaroid-photo {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: var(--surface-2);
+}
+
+.polaroid-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;   /* faces sit high in a headshot */
+}
+
+/* Gel wash on the board only. Absent on a candidate's own detail page. */
+.photo-gel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: color;
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--gel-magenta) 38%, transparent),
+    transparent 48%,
+    color-mix(in oklab, var(--gel-blue) 38%, transparent)
+  );
+}
+
+.polaroid-caption {
+  position: absolute;
+  left: 0.55rem;
+  right: 0.55rem;
+  bottom: 0.35rem;
+  font-family: var(--font-mark);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--accent-fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.polaroid-mini { padding: 0.3rem 0.3rem 0.3rem; }
+
+.polaroid-mini::before {
+  width: 1.4rem;
+  height: 0.4rem;
+  top: -0.28rem;
+}
+
+.polaroid-meta {
+  margin-top: 0.65rem;
+  display: grid;
+  gap: 0.4rem;
+  justify-items: start;
+}
+
 /* Ticker --------------------------------------------------------------- */
 
 .marquee {
@@ -291,8 +422,23 @@ body::after {
 /* Prose pages keep a readable measure inside the wide shell. */
 .site-main-prose { max-width: var(--measure); }
 
-h1 { font-size: 1.6rem; line-height: 1.25; margin: 0 0 0.5rem; }
-h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+h1 { font-size: clamp(2.6rem, 7vw, 4.2rem); margin: 0 0 0.75rem; }
+h2 { font-size: clamp(1.8rem, 4vw, 2.4rem); margin: 2.75rem 0 0.75rem; }
+h3 { font-size: 1.3rem; margin: 1.75rem 0 0.5rem; }
+
+/* Section label + title, the stamp sitting above the marquee heading. */
+.section-head { margin: 2.75rem 0 1rem; }
+.section-head > .stamp { margin-bottom: 0.85rem; }
+.section-head h1,
+.section-head h2 { margin: 0 0 0.4rem; }
 
 .page-intro {
   color: var(--ink-soft);
@@ -433,79 +579,62 @@ h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
 
 /* Candidates */
 
+/* A wall of snapshots, not two giant headshots -- 5 up on a desktop, 2 on a
+   phone. Rows are tall because each polaroid carries a caption border. */
 .candidate-grid {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.9rem 1.25rem;
 }
 
-.candidate-card {
-  padding: 0;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-}
+@media (min-width: 640px) { .candidate-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 900px) { .candidate-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 1120px) { .candidate-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
 
-.candidate-card-link {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  padding: 0.85rem;
-  text-decoration: none;
-  color: inherit;
-  border-radius: inherit;
-}
+.candidate-card { min-width: 0; }
 
-.candidate-card-link:hover,
-.candidate-card-link:focus-visible {
-  outline: none;
-}
-
-.candidate-card:has(.candidate-card-link:hover),
-.candidate-card:has(.candidate-card-link:focus-visible) {
-  border-color: color-mix(in oklab, var(--ink) 30%, transparent);
-}
-
-.candidate-photo {
-  width: 72px;
-  height: 72px;
-  flex: none;
-  border-radius: 50%;
-  object-fit: cover;
-  background: var(--line);
-}
-
-.candidate-body { min-width: 0; }
-
-.candidate-name {
-  margin: 0 0 0.15rem;
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.candidate-snippet { margin: 0.25rem 0 0; }
+.candidate-snippet { margin: 0; }
 
 .candidate-detail-head {
   display: flex;
-  gap: 1.25rem;
+  gap: 1.75rem;
   align-items: flex-start;
   flex-wrap: wrap;
 }
 
-.candidate-detail-photo {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: var(--line);
-}
+.polaroid-detail { width: 220px; flex: none; }
 
 .candidate-bio { white-space: pre-wrap; }
 
-.sort-bar { margin-top: 0; }
+.sort-bar {
+  margin: 0 0 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.sort-bar a,
+.sort-bar strong {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+  color: var(--ink-soft);
+}
+
+.sort-bar strong {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+}
+
+.sort-bar a:hover { color: var(--ink); }
 
 audio {
   width: 100%;
@@ -666,4 +795,39 @@ a.button:active { transform: scale(0.96); }
   /* The ticker is decorative and aria-hidden, so a frozen first row is the
      honest resting state -- not a scroll bar the reader has to drag. */
   .marquee-track { animation: none; }
+
+  .polaroid,
+  .polaroid-link:hover .polaroid,
+  .polaroid-link:focus-visible .polaroid,
+  .taped-note { transform: none; }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.site-footer-mark a {
+  color: inherit;
+  text-decoration-color: color-mix(in oklab, var(--gel-magenta-text) 55%, transparent);
+}
+
+.site-footer-mark a:hover { text-decoration-color: var(--gel-magenta-text); }
+
+/* A profile with no photograph yet: an empty frame reads better than a
+   tinted blank, and the mark keeps it looking taped-up rather than broken. */
+.polaroid-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mark);
+  font-size: 2.4rem;
+  color: color-mix(in oklab, var(--ink) 22%, transparent);
 }

@@ -23,7 +23,7 @@ class LeaderboardViewTests(RatingsTestCase):
         response = self.client.get(reverse("ratings:leaderboard"))
         self.assertContains(response, "New Voice")
         self.assertContains(response, "The main board fills in")
-        self.assertContains(response, 'class="candidate-card-link"')
+        self.assertContains(response, 'class="polaroid-link"')
 
     def test_no_raw_template_syntax_reaches_the_page(self):
         body = self.client.get(reverse("ratings:leaderboard")).content.decode()

@@ -59,7 +59,16 @@
   </main>
   <footer class="site-footer">
     <p class="site-footer-line">Producers advise. The show decides. Everything is reviewed before it goes public.</p>
-    <p class="site-footer-mark">In the morning.</p>
+    {% comment %}
+      Value for value is the show's funding model, so the footer mark is the
+      donation page rather than a slogan. External, so it opens in a new tab
+      and carries rel=noopener.
+    {% endcomment %}
+    <p class="site-footer-mark">
+      <a href="https://www.noagendadonations.com" target="_blank" rel="noopener noreferrer">
+        Value for value<span class="visually-hidden"> (opens in a new tab)</span>
+      </a>
+    </p>
   </footer>
 </body>
 </html>

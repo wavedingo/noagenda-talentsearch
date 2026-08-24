@@ -102,3 +102,22 @@ class AboutTests(TestCase):
         response = self.client.get("/about/")
         self.assertContains(response, "as soon as they sign in")
         self.assertNotContains(response, "0 hours after signup")
+
+
+class PolaroidTests(TestCase):
+    def test_tilt_is_stable_for_a_slug_and_varies_between_slugs(self):
+        """The wall must not twitch as you page through it, and the filter has
+        to agree across processes -- hash() is salted per interpreter, so a
+        card would lean differently on each worker."""
+        from core.templatetags.stagecraft import tilt
+
+        self.assertEqual(tilt("dana-whitlock"), tilt("dana-whitlock"))
+        self.assertNotEqual(tilt("dana-whitlock"), tilt("priya-raman"))
+        self.assertEqual(tilt(""), "0deg")
+
+    def test_tilt_stays_inside_the_design_span(self):
+        from core.templatetags.stagecraft import TILT_SPAN, tilt
+
+        for slug in ("a", "big-sister-mo", "the-night-shift", "z" * 40):
+            with self.subTest(slug=slug):
+                self.assertLessEqual(abs(float(tilt(slug).removesuffix("deg"))), TILT_SPAN)
