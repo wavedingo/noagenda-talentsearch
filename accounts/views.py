@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
@@ -116,6 +117,10 @@ def account_view(request):
         if form.is_valid():
             request.user.display_name = form.cleaned_data["display_name"]
             request.user.save(update_fields=["display_name"])
+            # Without this the page re-renders identically and the save looks
+            # like it did nothing.
+            messages.success(request, "Saved.")
+            return redirect("accounts:account")
     else:
         form = AccountForm(initial={"display_name": request.user.display_name})
     return render(request, "accounts/account.html", {"form": form})

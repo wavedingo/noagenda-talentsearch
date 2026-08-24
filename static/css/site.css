@@ -1032,3 +1032,51 @@ a.button:active { transform: scale(0.96); }
   .board-rank { width: 1.5rem; font-size: 1.2rem; }
   .board-snippet { display: none; }
 }
+
+/* Account page ---------------------------------------------------------- */
+
+.account-form { margin-bottom: 2.5rem; }
+
+.account-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0 0 3.5rem;
+}
+
+/* Deleting an account is irreversible, so it gets its own panel rather than
+   sitting a few pixels below Save where a mis-click reaches it. */
+.danger-zone {
+  padding: 1.5rem;
+  border: 1px dashed color-mix(in oklab, var(--bad) 45%, transparent);
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklab, var(--bad) 7%, transparent);
+}
+
+.danger-zone-title {
+  margin: 0 0 0.6rem;
+  font-size: 1.5rem;
+  color: var(--bad);
+}
+
+.danger-zone p { margin: 0 0 1.25rem; }
+
+.button-danger {
+  color: var(--bad);
+  background: transparent;
+  border-color: color-mix(in oklab, var(--bad) 55%, transparent);
+  transition:
+    color 150ms var(--ease),
+    background-color 150ms var(--ease),
+    border-color 150ms var(--ease),
+    transform 150ms var(--ease);
+}
+
+/* Filling on hover is the warning: it stops looking like the quiet buttons
+   next to it at exactly the moment the pointer is over it. */
+.button-danger:hover,
+.button-danger:focus-visible {
+  color: var(--bg);
+  background: var(--bad);
+  border-color: var(--bad);
+}
