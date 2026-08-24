@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ episode.episode_number }} — {{ episode.title_display }} — No Agenda Talent Search{% endblock %}
+{% block main_modifier %}site-main-prose{% endblock %}
 {% block content %}
 <p class="note"><a href="{% url 'episodes:list' %}">← All episodes</a></p>
 

@@ -20,23 +20,34 @@
 </head>
 <body>
   <header class="site-header">
-    <a class="site-title" href="{% url 'core:home' %}">
-      <img class="site-logo" src="{% static 'img/logo-light.svg' %}" alt="No Agenda Talent Search" width="58" height="48" decoding="async">
-    </a>
-    <nav class="site-nav">
-      <a href="{% url 'candidates:list' %}">Candidates</a>
-      <a href="{% url 'episodes:list' %}">Episodes</a>
-      <a href="{% url 'ratings:leaderboard' %}">Favorites</a>
-      <a href="{% url 'core:about' %}">About</a>
-      {% if user.is_authenticated %}
-        <a href="{% url 'candidates:audition' %}">Audition</a>
-        <a href="{% url 'accounts:account' %}">Account</a>
-      {% else %}
-        <a href="{% url 'accounts:request_link' %}">Log in</a>
-      {% endif %}
-    </nav>
+    <div class="site-header-bar">
+      <a class="site-title" href="{% url 'core:home' %}">
+        <img class="site-logo" src="{% static 'img/logo-light.svg' %}" alt="" width="58" height="48" decoding="async">
+        <span class="site-wordmark">
+          <span class="site-wordmark-kicker">No Agenda</span>
+          <span class="site-wordmark-name">Talent Search</span>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="Main">
+        <a href="{% url 'candidates:list' %}">Candidates</a>
+        <a href="{% url 'episodes:list' %}">Episodes</a>
+        <a href="{% url 'ratings:leaderboard' %}">Favorites</a>
+        <a href="{% url 'core:about' %}">About</a>
+        {% comment %}
+        The mock drops both of these (design decision 4). On a magic-link-only
+        site that leaves an anonymous producer no way to sign in from any page.
+        {% endcomment %}
+        {% if user.is_authenticated %}
+          <a href="{% url 'accounts:account' %}">Account</a>
+          <a class="button site-nav-cta" href="{% url 'candidates:audition' %}">Audition</a>
+        {% else %}
+          <a href="{% url 'accounts:request_link' %}">Log in</a>
+        {% endif %}
+      </nav>
+    </div>
+    {% include "core/_ticker.html" %}
   </header>
-  <main class="site-main">
+  <main class="site-main {% block main_modifier %}{% endblock %}">
     {% if messages %}
       <ul class="messages">
         {% for message in messages %}
@@ -46,5 +57,9 @@
     {% endif %}
     {% block content %}{% endblock %}
   </main>
+  <footer class="site-footer">
+    <p class="site-footer-line">Producers advise. The show decides. Everything is reviewed before it goes public.</p>
+    <p class="site-footer-mark">In the morning.</p>
+  </footer>
 </body>
 </html>

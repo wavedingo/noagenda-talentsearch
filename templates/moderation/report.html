@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Report {{ candidate.stage_name }} — No Agenda Talent Search{% endblock %}
+{% block main_modifier %}site-main-prose{% endblock %}
 {% block content %}
 <p class="note"><a href="{% url 'candidates:detail' candidate.slug %}">← Back to {{ candidate.stage_name }}</a></p>
 

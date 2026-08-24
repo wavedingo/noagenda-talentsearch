@@ -44,6 +44,9 @@
   --font-mark: "Shantell Sans", "Segoe Script", cursive;
 
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --shell: 69rem;   /* header, footer and the wide grids */
+  --measure: 42rem; /* prose column -- About, bios, form help */
 }
 
 * { box-sizing: border-box; }
@@ -76,40 +79,217 @@ a {
 
 a:hover { text-decoration-color: var(--ink); }
 
+/* Type helpers --------------------------------------------------------- */
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.kicker {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.mark {
+  font-family: var(--font-mark);
+  font-weight: 600;
+}
+
+/* Stage wash ----------------------------------------------------------- */
+
+/* Two gels only -- magenta and purple-blue, several sources. Anchored to the
+   top of the document and one viewport tall, so it scrolls away rather than
+   stretching down a long page like About. */
+body::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 100vh;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 95% 52% at 50% -6%, rgba(212, 82, 126, 0.34), transparent 58%),
+    radial-gradient(ellipse 38% 42% at 8% 4%, rgba(212, 82, 126, 0.16), transparent 50%),
+    radial-gradient(ellipse 50% 52% at 94% 0%, rgba(90, 78, 207, 0.34), transparent 56%),
+    radial-gradient(ellipse 32% 38% at 80% 22%, rgba(90, 78, 207, 0.12), transparent 48%);
+}
+
+/* Film grain -- keeps the gels from banding on cheap phone panels. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* Header --------------------------------------------------------------- */
+
 .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: color-mix(in oklab, var(--bg) 92%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid color-mix(in oklab, var(--ink) 10%, transparent);
+}
+
+.site-header-bar {
+  max-width: var(--shell);
+  margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 1.25rem;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--line);
-  background: var(--surface);
+  padding: 0.85rem 1.25rem;
 }
 
 .site-title {
-  display: block;
-  line-height: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   text-decoration: none;
+  color: var(--ink);
 }
 
 .site-logo {
   display: block;
-  height: 48px;
+  height: 40px;
   width: auto;
+  flex: none;
+}
+
+.site-wordmark {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.site-wordmark-kicker {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.site-wordmark-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.35rem;
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .site-nav {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.15rem;
+  align-items: center;
   font-size: 0.95rem;
 }
 
-.site-main {
-  max-width: 46rem;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 4rem;
+.site-nav a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition: color 150ms var(--ease);
 }
+
+.site-nav a:hover,
+.site-nav a:focus-visible { color: var(--ink); }
+
+.site-nav .site-nav-cta {
+  min-height: 0;
+  padding: 0.4rem 0.9rem;
+  color: var(--accent-fg);
+  font-size: 0.9rem;
+}
+
+.site-nav .site-nav-cta:hover { color: var(--accent-fg); }
+
+/* Ticker --------------------------------------------------------------- */
+
+.marquee {
+  overflow: hidden;
+  border-top: 1px solid color-mix(in oklab, var(--ink) 8%, transparent);
+  background: color-mix(in oklab, var(--bg-deep) 70%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 2.25rem;
+  padding: 0.45rem 0;
+  animation: marquee 42s linear infinite;
+}
+
+.marquee-item {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.marquee-item::after {
+  content: "·";
+  margin-left: 2.25rem;
+  color: var(--gel-magenta-text);
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Footer --------------------------------------------------------------- */
+
+.site-footer {
+  max-width: var(--shell);
+  margin: 4rem auto 0;
+  padding: 1.5rem 1.25rem 2.5rem;
+  border-top: 1px solid color-mix(in oklab, var(--ink) 10%, transparent);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.site-footer-line {
+  margin: 0;
+  max-width: 34rem;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.site-footer-mark {
+  margin: 0;
+  font-family: var(--font-mark);
+  font-weight: 600;
+  color: var(--gel-magenta-text);
+}
+
+.site-main {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 2rem 1.25rem 2rem;
+}
+
+/* Prose pages keep a readable measure inside the wide shell. */
+.site-main-prose { max-width: var(--measure); }
 
 h1 { font-size: 1.6rem; line-height: 1.25; margin: 0 0 0.5rem; }
 h2 { font-size: 1.15rem; margin: 2rem 0 0.75rem; }
@@ -470,3 +650,20 @@ a.button:active { transform: scale(0.96); }
 
 .star-form button.star-on { color: var(--star); border-color: var(--star); }
 .star-form button.star:hover { color: var(--star-hot); }
+
+
+/* Motion ---------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* The ticker is decorative and aria-hidden, so a frozen first row is the
+     honest resting state -- not a scroll bar the reader has to drag. */
+  .marquee-track { animation: none; }
+}

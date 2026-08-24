@@ -31,10 +31,33 @@ class BrandingTests(TestCase):
     def test_header_logo_and_favicons_are_linked(self):
         response = self.client.get("/")
         self.assertContains(response, 'class="site-logo"')
-        self.assertContains(response, 'alt="No Agenda Talent Search"')
         self.assertContains(response, 'rel="icon"')
         self.assertContains(response, "/static/img/favicon.svg")
         self.assertContains(response, "/static/img/og-image.png")
+
+    def test_logo_is_decorative_beside_the_wordmark(self):
+        """The header pairs the mark with "No Agenda / Talent Search" as real
+        text, so the image is alt="" -- otherwise the link's accessible name
+        says the site's name twice."""
+        response = self.client.get("/")
+        self.assertContains(response, 'class="site-logo" src="/static/img/logo-light.svg" alt=""')
+        self.assertContains(response, "site-wordmark-kicker")
+        self.assertContains(response, "Talent Search")
+
+    def test_ticker_renders_and_is_hidden_from_assistive_tech(self):
+        """The ticker is a bumper sticker, not navigation. It also has to be
+        duplicated exactly for the -50% marquee loop to be seamless."""
+        response = self.client.get("/")
+        self.assertContains(response, 'class="marquee" aria-hidden="true"')
+        self.assertContains(response, "Troll room is listening", count=2)
+        self.assertNotContains(response, "Not a vote")
+
+    def test_footer_is_present_on_every_page(self):
+        for path in ("/", "/candidates/", "/episodes/", "/about/", "/leaderboard/"):
+            with self.subTest(path=path):
+                response = self.client.get(path)
+                self.assertContains(response, "Producers advise. The show decides.")
+                self.assertContains(response, "site-footer-mark")
 
     def test_branding_is_dark_only(self):
         """The site has no light theme (refresh decision 3), so the logo and

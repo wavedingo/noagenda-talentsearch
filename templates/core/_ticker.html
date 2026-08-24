@@ -1,0 +1,22 @@
+{% comment %}
+Bumper ticker under the header bar. The phrases are static, so this needs no
+context processor and no query -- it renders on every page, including the
+admin, at zero cost. aria-hidden because the real navigation is the header
+links; a screen reader gains nothing from a looping bumper sticker.
+
+The list is duplicated so the -50% translate loops seamlessly. Edit both.
+{% endcomment %}
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    {% for i in "12" %}
+      <span class="marquee-item">In the morning</span>
+      <span class="marquee-item">Value for value</span>
+      <span class="marquee-item">I got Ants!</span>
+      <span class="marquee-item">No ads · no masters</span>
+      <span class="marquee-item">Time · talent · treasure</span>
+      <span class="marquee-item">Troll room is listening</span>
+      <span class="marquee-item">Media deconstruction</span>
+      <span class="marquee-item">Jingles welcome</span>
+    {% endfor %}
+  </div>
+</div>
