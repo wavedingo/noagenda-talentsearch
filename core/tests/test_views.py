@@ -100,9 +100,29 @@ class AboutTests(TestCase):
         response = self.client.get("/about/")
         self.assertEqual(response.status_code, 200)
 
-    def test_about_renders_house_rules(self):
+    def test_about_renders_the_compact_and_keeps_its_reasoning(self):
+        """Renamed from "House Rules" -- rules is the wrong register for a
+        voluntary compact. The paragraphs stay: the mock compressed each one
+        to a single line, and the reasoning is the part doing the work."""
         response = self.client.get("/about/")
-        self.assertContains(response, "House Rules")
+        self.assertContains(response, "The compact")
+        self.assertContains(response, 'id="the-compact"')
+        self.assertNotContains(response, "House Rules")
+        self.assertContains(response, "not the assignment")
+        self.assertContains(response, "Low ratings are allowed. Cruelty is not.")
+
+    def test_about_keeps_the_sections_the_mock_dropped(self):
+        """The mock's About loses the demo-tape checklist, the only takedown
+        address on the site, and the closing thanks. All three are kept."""
+        response = self.client.get("/about/")
+        self.assertContains(response, "Who should audition")
+        self.assertContains(response, "Sounds like a")
+        self.assertContains(response, "hello@noagendatalentsearch.com")
+        self.assertContains(response, "Thank you for courage.")
+
+    def test_home_links_to_the_compact_anchor(self):
+        response = self.client.get("/")
+        self.assertContains(response, "/about/#the-compact")
 
     def test_about_renders_live_vote_eligibility_hours_not_hardcoded(self):
         cache.clear()

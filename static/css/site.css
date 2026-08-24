@@ -540,10 +540,10 @@ h3 { font-size: 1.3rem; margin: 1.75rem 0 0.5rem; }
 }
 
 .empty-state {
-  padding: 1.5rem;
-  background: var(--surface);
-  border: 1px dashed var(--line);
-  border-radius: var(--radius);
+  padding: 1.75rem;
+  background: color-mix(in oklab, var(--surface-2) 55%, transparent);
+  border: 1px dashed color-mix(in oklab, var(--ink) 20%, transparent);
+  border-radius: var(--radius-xl);
   color: var(--ink-soft);
 }
 
@@ -833,6 +833,7 @@ a.button {
 .stacked-form select,
 .stacked-form textarea {
   width: 100%;
+  max-width: 30rem;
   padding: 0.55rem 0.65rem;
   font: inherit;
   color: var(--ink);
@@ -840,6 +841,8 @@ a.button {
   border: 1px solid var(--line);
   border-radius: 8px;
 }
+
+.stacked-form textarea { max-width: 100%; }
 
 .stacked-form .helptext {
   display: block;

@@ -104,6 +104,35 @@ Reference `@theme` → `site.css :root`. Existing names on the left of the arrow
 
 Schema changes, the `SAMPLE` pill, auth flow changes, moderation UI, any new sort or filter, JavaScript beyond none (the marquee is CSS-only, the rating widget stays a five-button POST).
 
+## Decided during implementation
+
+17. **Only the top three board rows carry an ordinal.** The mock numbers every
+    row 01-07 on Favorites and 01-04 on the home board. Spec 1.3 ("celebrate the
+    top; never publicly rank the bottom") is satisfied by numbering the podium,
+    but Phase 4 decision 11 went further -- "no `#1` / `#2`, ordinals invite a
+    race the copy says this is not" -- and that stricter rule is **superseded
+    here**. Rows past third render a blank rank cell so the columns still line
+    up. See `docs/superpowers/specs/2026-08-22-phase4-ratings-design.md`.
+
+18. **The footer mark is a link to noagendadonations.com**, not a slogan. The
+    prompt says "Value for value" and the screenshots say "In the morning."; the
+    resolution is the prompt's words pointing at the show's donation page, in a
+    new tab with `rel="noopener noreferrer"` and a visually-hidden note that it
+    opens a new tab.
+
+19. **The Currently leading card has an empty state.** Discover Talent lives on
+    that card, and the card only renders when a rising demo exists -- so on a
+    quiet board the button vanished from the home page entirely. The slot now
+    renders a second card either way, keeping the row at two.
+
+20. **The gel wash comes off when there is no photograph.** Washing an empty
+    frame renders a magenta-to-blue gradient swatch that reads as a broken
+    image. No photo means an empty cream frame and a pencilled question mark.
+
+21. **The hero re-encode.** 1792px WebP at q76 is 64KB (from 370KB) and the
+    900px phone variant is 22KB. Served via `<picture>` with JPEG fallbacks at
+    both widths.
+
 ## Commit sequence
 
 1. Tokens + fonts — `:root` swap, self-hosted faces, dark-only. Every page shifts colour; no layout moves.

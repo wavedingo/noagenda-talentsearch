@@ -27,7 +27,10 @@
 
 10. **Episode-list badges mean tagged appearances, not feed names.** Phase 2 design decision 2, delayed until this phase because there were no appearances yet. B.5: badge episodes that have tagged guest-host appearances. Feed-declared names remain visible on the episode page as sourced feed fact, and as one-click suggestions on the tagging screen. They do not, by themselves, make an episode rateable or badged.
 
-11. **The public leaderboard never numbers the bottom, and does not use ordinals on the top either.** Top N by `composite_score` among live candidates who have at least one appearance; Rising Demos is live candidates with zero appearances, top N by smoothed demo score. No `#1` / `#2` — the list is the celebration; ordinals invite a race the copy says this is not. Full rankings with raw vs. smoothed scores live in Django admin. Withdrawn / rejected / banned candidates are skipped by the job (their item-level history stays).
+11. **The public leaderboard never numbers the bottom, and does not use ordinals on the top either.** Top N by `composite_score` among live candidates who have at least one appearance; Rising Demos is live candidates with zero appearances, top N by smoothed demo score. No `#1` / `#2` — the list is the celebration; ordinals invite a race the copy says this is not. **Superseded 2026-08-24** by the website refresh (decision 17): the top three
+rows now carry an ordinal, on the reading that spec 1.3 asks us to celebrate the
+top and only forbids ranking the bottom. Rows past third stay unnumbered.
+Full rankings with raw vs. smoothed scores live in Django admin. Withdrawn / rejected / banned candidates are skipped by the job (their item-level history stays).
 
 12. **Unlinked appearances are rateable but do not enter the leaderboard** until a candidate is linked. Their ratings still move `C_appearances` (the site-wide prior). A guest host who never auditioned here can be rated the night they appear; claiming a profile later carries those ratings onto that candidate's appearance score automatically.
 
