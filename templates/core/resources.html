@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Resources — No Agenda Talent Search{% endblock %}
+{% block main_modifier %}site-main-prose{% endblock %}
+{% block content %}
+<div class="section-head">
+  <span class="stamp">Getting started</span>
+  <h1>Resources</h1>
+</div>
+
+<p class="page-intro">
+  Creating your first audio recording can feel intimidating, but we've got your back.
+</p>
+
+<p>
+  For your demo, all you need is an <strong>.mp3</strong> audio file. Most computers
+  have a built-in microphone, so you may already have everything you need to get
+  started. Here are some free resources to help you record and create your file.
+</p>
+
+<p class="note">Every link below opens in a new tab.</p>
+
+<h2>Record your voice</h2>
+
+<ul class="resource-list">
+  <li>
+    <a href="https://support.audacityteam.org/basics/recording-your-voice-and-microphone"
+       target="_blank" rel="noopener noreferrer">How to record your voice with a microphone</a>
+    <p class="note">A beginner-friendly guide from Audacity covering the basics of recording your voice.</p>
+  </li>
+  <li>
+    <a href="https://www.audacityteam.org" target="_blank" rel="noopener noreferrer">Audacity</a>
+    <p class="note">Free, open-source audio recording and editing software for Windows, macOS and Linux.</p>
+  </li>
+</ul>
+
+<h2>Going further</h2>
+
+<p>
+  If you'd like to go beyond a basic recording and chase studio-quality sound,
+  these go deeper.
+</p>
+
+<ul class="resource-list">
+  <li>
+    <a href="https://www.schoolofpodcasting.com" target="_blank" rel="noopener noreferrer">School of Podcasting</a>
+    <p class="note">Free podcasting education — recording, editing, equipment and more.</p>
+  </li>
+  <li>
+    <a href="http://podfathergear.com" target="_blank" rel="noopener noreferrer">Podfather Gear</a>
+    <p class="note">Adam Curry's original podcast setup, with instructions and links to the equipment used.</p>
+  </li>
+  <li>
+    <a href="https://github.com/adamc199/currycaster" target="_blank" rel="noopener noreferrer">Curry Caster</a>
+    <p class="note">If you're more technical and feeling adventurous, Adam Curry's custom recording software.</p>
+  </li>
+</ul>
+
+<p class="note">
+  None of this is required. A quiet room and the microphone you already own is
+  enough — a tight five minutes recorded on a laptop beats a polished hour.
+</p>
+
+<p><a href="{% url 'candidates:audition' %}">Back to your audition →</a></p>
+{% endblock %}

@@ -45,6 +45,16 @@ def about(request):
     )
 
 
+def resources(request):
+    """Recording help for producers who have never made an audio file.
+
+    Deliberately not in the site nav (there is one link to it, from the demo
+    upload box on the Audition page) -- it is help at the moment of need, not
+    a section of the site.
+    """
+    return render(request, "core/resources.html")
+
+
 def healthz(request):
     with connection.cursor() as cursor:
         cursor.execute("SELECT 1")

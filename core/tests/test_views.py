@@ -156,3 +156,28 @@ class PolaroidTests(TestCase):
         for slug in ("a", "big-sister-mo", "the-night-shift", "z" * 40):
             with self.subTest(slug=slug):
                 self.assertLessEqual(abs(float(tilt(slug).removesuffix("deg"))), TILT_SPAN)
+
+
+class ResourcesTests(TestCase):
+    def test_resources_page_renders(self):
+        response = self.client.get("/resources/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "we've got your back")
+        self.assertContains(response, "audacityteam.org")
+        self.assertContains(response, "currycaster")
+
+    def test_external_links_are_safe_and_open_in_a_new_tab(self):
+        """Every link here leaves the site, so none of them may hand the
+        destination a window.opener handle back to us."""
+        response = self.client.get("/resources/")
+        html = response.content.decode()
+        external = html.count('href="http')
+        self.assertEqual(external, html.count('rel="noopener noreferrer"'))
+        self.assertEqual(external, html.count('target="_blank"'))
+
+    def test_resources_is_reachable_from_the_demo_upload_box_but_not_the_nav(self):
+        """Help at the moment of need. It is deliberately absent from the
+        header -- a producer meets it when they are staring at the file
+        picker, not as a section of the site."""
+        home = self.client.get("/")
+        self.assertNotContains(home, "/resources/")

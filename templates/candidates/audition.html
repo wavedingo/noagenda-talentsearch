@@ -93,6 +93,8 @@
       <p class="note">
         MP3 only, up to {{ max_file_mb }} MB and {{ max_duration_min }} minutes.
         Uploading a new demo replaces the old one and starts its ratings fresh.
+        Never recorded anything before?
+        <a href="{% url 'core:resources' %}">Here's how to get started</a>.
       </p>
       <button type="submit">Upload demo</button>
     </form>

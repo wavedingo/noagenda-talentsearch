@@ -244,6 +244,14 @@ class DemoUploadViewTests(ViewTestCase):
     def _upload(self, name="demo.mp3", seconds=2):
         return upload_from(make_mp3(self.work_path(name), seconds=seconds), name=name)
 
+    def test_upload_box_offers_recording_help(self):
+        """A producer who has never made an audio file meets the resources
+        page here, staring at the file picker -- not by hunting for it in a
+        nav it is deliberately absent from."""
+        response = self.client.get(reverse("candidates:audition"))
+        self.assertContains(response, reverse("core:resources"))
+        self.assertContains(response, "Never recorded anything before?")
+
     def test_uploading_queues_a_demo(self):
         self.client.post(reverse("candidates:upload_demo"), {"demo": self._upload()})
         demo = self.candidate.demos.get()
