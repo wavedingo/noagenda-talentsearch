@@ -27,8 +27,8 @@
       <a class="button button-quiet" href="{% url 'episodes:list' %}">Rate guest appearances</a>
     </div>
     <p class="note hero-fine">
-      Everything is reviewed before it goes public. Ratings inform the chair —
-      they don't fill it.
+      Everything is reviewed before it goes public. Ratings inform the chair.
+      They don't fill it.
     </p>
   </div>
 </section>
@@ -52,7 +52,7 @@
         <span class="stamp stamp-blue">Currently leading</span>
         <p class="note">
           Highest-rated demo among candidates who haven't guest-hosted yet.
-          Not a vote — just who's landing with producers right now.
+          Just who's got the producers' ear right now.
         </p>
         {% include "ratings/_stars.html" with summary=leading.demo_summary %}
         <p><a href="{% url 'candidates:detail' leading.slug %}">Listen to the tape →</a></p>

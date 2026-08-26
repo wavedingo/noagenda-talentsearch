@@ -67,6 +67,13 @@ class BrandingTests(TestCase):
         self.assertNotIn('marquee-item">Not a vote', html)
         self.assertIn("Not a vote", html)
 
+    def test_not_a_vote_is_said_once_on_the_home_page(self):
+        """It is the heading of the taped note. The Currently leading card sits
+        immediately to its left, so repeating the phrase there read as a
+        stutter rather than as emphasis."""
+        response = self.client.get("/")
+        self.assertContains(response, "Not a vote", count=1)
+
     def test_footer_is_present_on_every_page(self):
         for path in ("/", "/candidates/", "/episodes/", "/about/", "/leaderboard/"):
             with self.subTest(path=path):
