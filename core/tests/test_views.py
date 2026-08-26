@@ -45,6 +45,20 @@ class HomeTests(TestCase):
             "Episodes with a guest host are highlighted; click on one to rate the appearance.",
         )
 
+    def test_rising_demos_note_explains_how_to_join_show_appearances(self):
+        from candidates.models import Candidate
+        from candidates.tests.helpers import make_candidate
+
+        make_candidate(status=Candidate.Status.LIVE, stage_name="New Voice")
+        response = self.client.get("/")
+        self.assertContains(response, "Rising demos")
+        self.assertContains(
+            response,
+            "Listen to demos and rate the ones that land. When someone guest-hosts,",
+        )
+        self.assertContains(response, "they join Show Appearances.")
+        self.assertNotContains(response, "The main board fills in")
+
 
 class BrandingTests(TestCase):
     def test_header_logo_and_favicons_are_linked(self):

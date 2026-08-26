@@ -98,7 +98,10 @@
     <a href="{% url 'ratings:leaderboard' %}">All favorites →</a>
   </div>
   {% if not favorites %}
-    <p class="note">The main board fills in once guest hosts start appearing on the show.</p>
+    <p class="note">
+      Listen to demos and rate the ones that land. When someone guest-hosts,
+      they join Show Appearances.
+    </p>
   {% endif %}
   <ul class="candidate-grid">
     {% for candidate in favorites|default:rising %}
