@@ -117,6 +117,9 @@
     </div>
     <a href="{% url 'episodes:list' %}">All episodes →</a>
   </div>
+  <p class="note">
+    Episodes with a guest host are highlighted; click on one to rate the appearance.
+  </p>
   <ul class="episode-list">
     {% for episode in latest_episodes %}
       <li class="episode-card">
