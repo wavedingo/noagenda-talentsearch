@@ -108,7 +108,7 @@ class AboutTests(TestCase):
         self.assertContains(response, "The compact")
         self.assertContains(response, 'id="the-compact"')
         self.assertNotContains(response, "House Rules")
-        self.assertContains(response, "not the assignment")
+        self.assertContains(response, "Nobody survives that comparison")
         self.assertContains(response, "Low ratings are allowed. Cruelty is not.")
 
     def test_about_keeps_the_sections_the_mock_dropped(self):
@@ -119,6 +119,19 @@ class AboutTests(TestCase):
         self.assertContains(response, "Sounds like a")
         self.assertContains(response, "hello@noagendatalentsearch.com")
         self.assertContains(response, "Thank you for courage.")
+
+    def test_about_links_to_the_recording_help_page(self):
+        response = self.client.get("/about/")
+        self.assertContains(response, reverse("core:resources"))
+        self.assertContains(response, "If you need help with recording audio")
+
+    def test_about_points_reports_at_the_in_product_route_and_email(self):
+        """Rule 7 names both ways to raise a problem. "Report this profile" is
+        a real control on every candidate page, so the copy has to keep
+        matching it."""
+        response = self.client.get("/about/")
+        self.assertContains(response, "Report this profile")
+        self.assertContains(response, "hello@noagendatalentsearch.com")
 
     def test_home_links_to_the_compact_anchor(self):
         response = self.client.get("/")
