@@ -34,6 +34,17 @@ class HomeTests(TestCase):
         self.assertContains(response, "Discover Talent")
         self.assertContains(response, "Not a vote")
 
+    def test_latest_episodes_section_explains_guest_host_ratings(self):
+        from episodes.tests.test_views import make_episode
+
+        make_episode(1896)
+        response = self.client.get("/")
+        self.assertContains(response, "Latest episodes")
+        self.assertContains(
+            response,
+            "Episodes with a guest host are highlighted; click on one to rate the appearance.",
+        )
+
 
 class BrandingTests(TestCase):
     def test_header_logo_and_favicons_are_linked(self):
