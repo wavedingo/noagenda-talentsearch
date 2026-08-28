@@ -42,7 +42,7 @@
             {% if leading.photo_url %}
               <img src="{{ leading.photo_url }}" alt="" decoding="async">
             {% else %}
-              <span class="polaroid-empty" aria-hidden="true">?</span>
+              {% include "core/_person_silhouette.html" %}
             {% endif %}
           </span>
           <span class="polaroid-caption">{{ leading.stage_name }}</span>

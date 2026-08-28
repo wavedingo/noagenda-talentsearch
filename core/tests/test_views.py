@@ -59,6 +59,15 @@ class HomeTests(TestCase):
         self.assertContains(response, "they join Show Appearances.")
         self.assertNotContains(response, "The main board fills in")
 
+    def test_missing_profile_photo_uses_a_person_silhouette_not_a_question_mark(self):
+        from candidates.models import Candidate
+        from candidates.tests.helpers import make_candidate
+
+        make_candidate(status=Candidate.Status.LIVE, stage_name="No Photo Yet")
+        response = self.client.get("/")
+        self.assertContains(response, 'class="person-silhouette"')
+        self.assertNotContains(response, 'polaroid-empty" aria-hidden="true">?')
+
 
 class BrandingTests(TestCase):
     def test_header_logo_and_favicons_are_linked(self):

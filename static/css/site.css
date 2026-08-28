@@ -965,16 +965,20 @@ a.button:active { transform: scale(0.96); }
 
 .site-footer-mark a:hover { text-decoration-color: var(--gel-magenta-text); }
 
-/* A profile with no photograph yet: an empty frame reads better than a
-   tinted blank, and the mark keeps it looking taped-up rather than broken. */
+/* A profile with no photograph yet: a silhouette reads as intentional, not a
+   broken image. */
 .polaroid-empty {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  font-family: var(--font-mark);
-  font-size: 2.4rem;
-  color: color-mix(in oklab, var(--ink) 22%, transparent);
+  color: color-mix(in oklab, var(--ink) 28%, transparent);
+}
+
+.person-silhouette {
+  display: block;
+  width: 44%;
+  height: 44%;
 }
 
 /* Board rows ------------------------------------------------------------ */
