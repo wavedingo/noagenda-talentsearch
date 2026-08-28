@@ -5,9 +5,11 @@ one thing each. Ranking math lives in scoring.py; this module is the ORM
 around it.
 """
 
+from dataclasses import dataclass
 from datetime import timedelta
 
 from django.db.models import Avg, Count
+from django.urls import reverse
 
 from candidates.models import Candidate, Demo
 from core.settings_util import get_setting
@@ -276,12 +278,112 @@ def leaderboard_size():
     return int(get_setting("leaderboard_size"))
 
 
-def community_favorites():
+@dataclass(frozen=True)
+class ShowAppearanceEntry:
+    """One row on the Show Appearances board — linked candidate or feed guest."""
+
+    display_name: str
+    appearance_score: float
+    appearance_summary: dict | None
+    candidate: Candidate | None
+    episode_number: int | None
+
+    @property
+    def url(self):
+        if self.candidate is not None:
+            return reverse("candidates:detail", args=[self.candidate.slug])
+        if self.episode_number is not None:
+            return reverse("episodes:detail", args=[self.episode_number])
+        return reverse("episodes:list")
+
+    @property
+    def photo_url(self):
+        return self.candidate.photo_url if self.candidate is not None else None
+
+    @property
+    def bio(self):
+        return self.candidate.bio if self.candidate is not None else ""
+
+    @property
+    def tilt_key(self):
+        if self.candidate is not None:
+            return self.candidate.slug
+        return self.display_name
+
+
+def aggregate_appearance_summary(appearances, threshold=None):
+    """Weighted average across one guest's appearances, or None below threshold."""
+    if threshold is None:
+        threshold = int(get_setting("min_votes_to_display"))
+    total_votes = sum(appearance.rating_count for appearance in appearances)
+    if total_votes < threshold:
+        return None
+    weighted = 0.0
+    for appearance in appearances:
+        if appearance.rating_avg is not None and appearance.rating_count:
+            weighted += appearance.rating_avg * appearance.rating_count
+    return {"average": weighted / total_votes, "count": total_votes}
+
+
+def show_appearances():
+    """Top guest hosts by appearance ratings — linked profiles and feed names."""
     size = leaderboard_size()
-    return list(
-        Candidate.objects.public().filter(composite_score__isnull=False)
-        .order_by("-composite_score", "-approved_at")[:size]
+    threshold = int(get_setting("min_votes_to_display"))
+    appearances = list(
+        Appearance.objects.select_related("candidate", "episode").order_by(
+            "-episode__published_at"
+        )
     )
+
+    grouped = {}
+    for appearance in appearances:
+        if appearance.candidate_id and appearance.candidate.is_public:
+            key = ("candidate", appearance.candidate_id)
+        else:
+            key = ("guest", appearance.guest_name.strip().lower())
+        grouped.setdefault(key, []).append(appearance)
+
+    entries = []
+    for key, group in grouped.items():
+        smoothed = [
+            appearance.smoothed_score
+            for appearance in group
+            if appearance.smoothed_score is not None
+        ]
+        score = appearance_score(smoothed)
+        if score is None:
+            continue
+        summary = aggregate_appearance_summary(group, threshold)
+        if key[0] == "candidate":
+            candidate = group[0].candidate
+            entries.append(
+                ShowAppearanceEntry(
+                    display_name=candidate.stage_name,
+                    appearance_score=score,
+                    appearance_summary=summary,
+                    candidate=candidate,
+                    episode_number=None,
+                )
+            )
+        else:
+            latest = group[0]
+            entries.append(
+                ShowAppearanceEntry(
+                    display_name=latest.guest_name,
+                    appearance_score=score,
+                    appearance_summary=summary,
+                    candidate=None,
+                    episode_number=latest.episode.episode_number,
+                )
+            )
+
+    entries.sort(key=lambda entry: (-entry.appearance_score, entry.display_name.lower()))
+    return entries[:size]
+
+
+def community_favorites():
+    """Backward-compatible alias for templates/tests migrating to show_appearances."""
+    return show_appearances()
 
 
 def rising_demos():

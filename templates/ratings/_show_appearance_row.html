@@ -1,0 +1,27 @@
+{% load stagecraft %}
+{% comment %}
+Show Appearances row — a linked candidate or a feed guest with no profile yet.
+Unlinked guests link to their most recent tagged episode so producers can rate
+the appearance they remember.
+{% endcomment %}
+<a class="board-row" href="{{ entry.url }}">
+  {% if forloop.counter <= 3 %}
+    <span class="board-rank" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>
+  {% else %}
+    <span class="board-rank board-rank-blank" aria-hidden="true"></span>
+  {% endif %}
+  <span class="polaroid polaroid-mini board-thumb" style="--tilt: {{ entry.tilt_key|tilt }}">
+    <span class="polaroid-photo{% if entry.photo_url %} photo-gel{% endif %}">
+      {% if entry.photo_url %}
+        <img src="{{ entry.photo_url }}" alt="" loading="lazy" decoding="async">
+      {% else %}
+        <span class="polaroid-empty" aria-hidden="true">?</span>
+      {% endif %}
+    </span>
+  </span>
+  <span class="board-body">
+    <span class="board-name">{{ entry.display_name }}</span>
+    {% if entry.bio %}<span class="note board-snippet">{{ entry.bio|truncatewords:16 }}</span>{% endif %}
+    {% include "ratings/_stars.html" with summary=entry.appearance_summary %}
+  </span>
+</a>

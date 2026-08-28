@@ -13,9 +13,9 @@
 <h2>Show appearances</h2>
 {% if favorites %}
   <ul class="favorites-list">
-    {% for candidate in favorites %}
+    {% for entry in favorites %}
       <li class="board-item">
-        {% include "ratings/_candidate_row.html" %}
+        {% include "ratings/_show_appearance_row.html" %}
       </li>
     {% endfor %}
   </ul>

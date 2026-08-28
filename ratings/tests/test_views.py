@@ -25,6 +25,17 @@ class LeaderboardViewTests(RatingsTestCase):
         self.assertContains(response, "The main board fills in")
         self.assertContains(response, 'class="board-row"')
 
+    def test_unlinked_guest_host_appears_on_show_appearances(self):
+        from candidates.tests.helpers import make_user
+        from ratings.services import recompute_scores, tag_appearance
+
+        episode = make_episode(1896)
+        tag_appearance(episode, make_user("mod@example.com"), guest_name="Rob Dew")
+        recompute_scores()
+        response = self.client.get(reverse("ratings:leaderboard"))
+        self.assertContains(response, "Rob Dew")
+        self.assertContains(response, reverse("episodes:detail", args=[1896]))
+
     def test_no_raw_template_syntax_reaches_the_page(self):
         body = self.client.get(reverse("ratings:leaderboard")).content.decode()
         for token in ("{#", "#}", "{%", "%}"):

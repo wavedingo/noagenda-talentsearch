@@ -10,14 +10,14 @@ from .ratelimit import rating_rate_limited
 from .services import (
     RatingError,
     attach_demo_summaries,
-    community_favorites,
     rising_demos,
+    show_appearances,
     submit_rating,
 )
 
 
 def leaderboard(request):
-    favorites = attach_demo_summaries(community_favorites())
+    favorites = show_appearances()
     rising = attach_demo_summaries(rising_demos())
     return render(
         request,
