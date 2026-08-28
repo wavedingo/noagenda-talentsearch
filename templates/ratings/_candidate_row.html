@@ -15,7 +15,7 @@ something this site stamps on a real person who put themselves forward.
       {% if candidate.photo_url %}
         <img src="{{ candidate.photo_url }}" alt="" loading="lazy" decoding="async">
       {% else %}
-        <span class="polaroid-empty" aria-hidden="true">?</span>
+        {% include "core/_person_silhouette.html" %}
       {% endif %}
     </span>
   </span>

@@ -18,7 +18,7 @@ get the stage treatment, on their own page they get their actual face.
       {% if candidate.photo_url %}
         <img src="{{ candidate.photo_url }}" alt="" loading="lazy" decoding="async">
       {% else %}
-        <span class="polaroid-empty" aria-hidden="true">?</span>
+        {% include "core/_person_silhouette.html" %}
       {% endif %}
     </span>
     <span class="polaroid-caption">{{ candidate.stage_name }}</span>

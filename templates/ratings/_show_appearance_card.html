@@ -5,7 +5,7 @@
       {% if entry.photo_url %}
         <img src="{{ entry.photo_url }}" alt="" loading="lazy" decoding="async">
       {% else %}
-        <span class="polaroid-empty" aria-hidden="true">?</span>
+        {% include "core/_person_silhouette.html" %}
       {% endif %}
     </span>
     <span class="polaroid-caption">{{ entry.display_name }}</span>
