@@ -5,9 +5,10 @@ from django.utils import timezone
 
 from accounts.tokens import create_magic_link
 from candidates.models import Candidate
-from candidates.tests.helpers import make_candidate
+from candidates.tests.helpers import make_candidate, set_runtime_setting
 from episodes.tests.test_views import make_episode
 from ratings.models import Appearance, Rating
+from ratings.services import submit_rating
 from ratings.tests.test_services import RatingsTestCase, make_live_demo, make_voter
 
 
@@ -29,9 +30,11 @@ class LeaderboardViewTests(RatingsTestCase):
         from candidates.tests.helpers import make_user
         from ratings.services import recompute_scores, tag_appearance
 
+        set_runtime_setting("min_votes_to_display", 1)
         episode = make_episode(1896)
-        tag_appearance(episode, make_user("mod@example.com"), guest_name="Rob Dew")
+        appearance = tag_appearance(episode, make_user("mod@example.com"), guest_name="Rob Dew")
         recompute_scores()
+        submit_rating(make_voter(), Rating.RateableType.APPEARANCE, appearance.pk, 5)
         response = self.client.get(reverse("ratings:leaderboard"))
         self.assertContains(response, "Rob Dew")
         self.assertContains(response, reverse("episodes:detail", args=[1896]))

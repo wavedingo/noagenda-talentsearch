@@ -354,6 +354,8 @@ def show_appearances():
         if score is None:
             continue
         summary = aggregate_appearance_summary(group, threshold)
+        if summary is None:
+            continue
         if key[0] == "candidate":
             candidate = group[0].candidate
             entries.append(
@@ -377,7 +379,14 @@ def show_appearances():
                 )
             )
 
-    entries.sort(key=lambda entry: (-entry.appearance_score, entry.display_name.lower()))
+    entries.sort(
+        key=lambda entry: (
+            -entry.appearance_score,
+            -entry.appearance_summary["average"],
+            -entry.appearance_summary["count"],
+            entry.display_name.lower(),
+        )
+    )
     return entries[:size]
 
 

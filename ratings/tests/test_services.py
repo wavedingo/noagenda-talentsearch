@@ -172,10 +172,12 @@ class ScoringJobTests(RatingsTestCase):
         self.assertEqual(self.candidate.demo_score, PRIOR_SEED)
 
     def test_appearance_moves_a_candidate_onto_the_main_board(self):
+        set_runtime_setting("min_votes_to_display", 1)
         episode = make_episode(1896)
         admin = make_user("mod@example.com")
-        tag_appearance(episode, admin, candidate=self.candidate)
+        appearance = tag_appearance(episode, admin, candidate=self.candidate)
         recompute_scores()
+        submit_rating(make_voter(), Rating.RateableType.APPEARANCE, appearance.pk, 5)
         self.candidate.refresh_from_db()
         self.assertIsNotNone(self.candidate.composite_score)
         entries = show_appearances()
@@ -183,18 +185,14 @@ class ScoringJobTests(RatingsTestCase):
         self.assertEqual(entries[0].candidate, self.candidate)
         self.assertEqual(rising_demos(), [])
 
-    def test_unlinked_appearance_enters_show_appearances(self):
+    def test_unlinked_appearance_without_ratings_stays_off_the_board(self):
         episode = make_episode(1896)
         admin = make_user("mod@example.com")
         tag_appearance(episode, admin, guest_name="Rob Dew")
         recompute_scores()
         self.candidate.refresh_from_db()
         self.assertIsNone(self.candidate.composite_score)
-        entries = show_appearances()
-        self.assertEqual(len(entries), 1)
-        self.assertIsNone(entries[0].candidate)
-        self.assertEqual(entries[0].display_name, "Rob Dew")
-        self.assertEqual(entries[0].episode_number, 1896)
+        self.assertEqual(show_appearances(), [])
         self.assertEqual(rising_demos(), [self.candidate])
 
     def test_unlinked_guest_with_enough_votes_shows_an_aggregate_summary(self):
@@ -215,6 +213,18 @@ class ScoringJobTests(RatingsTestCase):
         self.assertEqual(len(entries), 1)
         self.assertEqual(entries[0].appearance_summary["count"], 4)
         self.assertAlmostEqual(entries[0].appearance_summary["average"], 4.5)
+
+    def test_rated_guest_ranks_above_an_unrated_tagged_guest(self):
+        set_runtime_setting("min_votes_to_display", 1)
+        admin = make_user("mod@example.com")
+        rob = tag_appearance(make_episode(1896), admin, guest_name="Rob Dew")
+        tag_appearance(make_episode(1895), admin, guest_name="Matt Long")
+        recompute_scores()
+        submit_rating(make_voter(email="v1@example.com"), Rating.RateableType.APPEARANCE, rob.pk, 5)
+        submit_rating(make_voter(email="v2@example.com"), Rating.RateableType.APPEARANCE, rob.pk, 5)
+        entries = show_appearances()
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].display_name, "Rob Dew")
 
     def test_withdrawn_candidates_are_dropped_from_scores(self):
         voter = make_voter()
