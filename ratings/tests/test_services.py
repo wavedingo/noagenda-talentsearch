@@ -16,6 +16,7 @@ from ratings.services import (
     public_rating_summary,
     recompute_scores,
     rising_demos,
+    show_appearances,
     submit_rating,
     tag_appearance,
 )
@@ -177,18 +178,43 @@ class ScoringJobTests(RatingsTestCase):
         recompute_scores()
         self.candidate.refresh_from_db()
         self.assertIsNotNone(self.candidate.composite_score)
-        self.assertEqual(community_favorites(), [self.candidate])
+        entries = show_appearances()
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].candidate, self.candidate)
         self.assertEqual(rising_demos(), [])
 
-    def test_unlinked_appearance_does_not_enter_the_leaderboard(self):
+    def test_unlinked_appearance_enters_show_appearances(self):
         episode = make_episode(1896)
         admin = make_user("mod@example.com")
         tag_appearance(episode, admin, guest_name="Rob Dew")
         recompute_scores()
         self.candidate.refresh_from_db()
         self.assertIsNone(self.candidate.composite_score)
-        self.assertEqual(community_favorites(), [])
+        entries = show_appearances()
+        self.assertEqual(len(entries), 1)
+        self.assertIsNone(entries[0].candidate)
+        self.assertEqual(entries[0].display_name, "Rob Dew")
+        self.assertEqual(entries[0].episode_number, 1896)
         self.assertEqual(rising_demos(), [self.candidate])
+
+    def test_unlinked_guest_with_enough_votes_shows_an_aggregate_summary(self):
+        set_runtime_setting("min_votes_to_display", 1)
+        episode_a = make_episode(1896)
+        episode_b = make_episode(1895)
+        admin = make_user("mod@example.com")
+        tag_appearance(episode_a, admin, guest_name="Rob Dew")
+        tag_appearance(episode_b, admin, guest_name="Rob Dew")
+        recompute_scores()
+        appearance_ids = list(Appearance.objects.values_list("pk", flat=True))
+        voter_a = make_voter(email="a@example.com")
+        voter_b = make_voter(email="b@example.com")
+        for appearance_id in appearance_ids:
+            submit_rating(voter_a, Rating.RateableType.APPEARANCE, appearance_id, 5)
+            submit_rating(voter_b, Rating.RateableType.APPEARANCE, appearance_id, 4)
+        entries = show_appearances()
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].appearance_summary["count"], 4)
+        self.assertAlmostEqual(entries[0].appearance_summary["average"], 4.5)
 
     def test_withdrawn_candidates_are_dropped_from_scores(self):
         voter = make_voter()

@@ -1,0 +1,19 @@
+{% load stagecraft %}
+<a class="polaroid-link" href="{{ entry.url }}">
+  <span class="polaroid" style="--tilt: {{ entry.tilt_key|tilt }}">
+    <span class="polaroid-photo{% if entry.photo_url %} photo-gel{% endif %}">
+      {% if entry.photo_url %}
+        <img src="{{ entry.photo_url }}" alt="" loading="lazy" decoding="async">
+      {% else %}
+        <span class="polaroid-empty" aria-hidden="true">?</span>
+      {% endif %}
+    </span>
+    <span class="polaroid-caption">{{ entry.display_name }}</span>
+  </span>
+</a>
+<div class="polaroid-meta">
+  {% if show_bio and entry.bio %}
+    <p class="note candidate-snippet">{{ entry.bio|truncatewords:12 }}</p>
+  {% endif %}
+  {% if show_stars %}{% include "ratings/_stars.html" with summary=entry.appearance_summary %}{% endif %}
+</div>

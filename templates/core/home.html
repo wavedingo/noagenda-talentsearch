@@ -104,9 +104,13 @@
     </p>
   {% endif %}
   <ul class="candidate-grid">
-    {% for candidate in favorites|default:rising %}
+    {% for entry in favorites|default:rising %}
       <li class="candidate-card">
-        {% include "ratings/_candidate_card.html" with show_bio=True show_stars=True %}
+        {% if favorites %}
+          {% include "ratings/_show_appearance_card.html" with show_bio=True show_stars=True %}
+        {% else %}
+          {% include "ratings/_candidate_card.html" with candidate=entry show_bio=True show_stars=True %}
+        {% endif %}
       </li>
     {% endfor %}
   </ul>
